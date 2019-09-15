@@ -1,0 +1,12 @@
+[package]
+name = "usbd-midi"
+version = "0.1.0"
+authors = ["beau trepp <beautrepp@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embedded-hal = "0.2.2"
+nb = "0.1.2"
+usb-device = {version = "0.2.3", path = "../usb-device" }  
