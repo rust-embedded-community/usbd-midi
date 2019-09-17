@@ -1,22 +1,9 @@
 use usb_device::class_prelude::*;
 use usb_device::Result;
 use crate::notes::Note;
+use crate::usb_constants::*;
 
-pub const USB_CLASS_NONE : u8 = 0x00;
-const USB_AUDIO_CLASS: u8 = 0x01;
-const USB_AUDIOCONTROL_SUBCLASS: u8 = 0x01;
-const USB_MIDISTREAMING_SUBCLASS: u8 =0x03;
-const MIDI_IN_JACK_SUBTYPE : u8 = 0x02;
-const MIDI_OUT_JACK_SUBTYPE : u8 = 0x03;
-const EMBEDDED : u8 = 0x01;
-const CS_INTERFACE: u8 = 0x24;
-const CS_ENDPOINT: u8 = 0x25;
-const HEADER_SUBTYPE: u8 = 0x01;
-const MS_HEADER_SUBTYPE: u8 = 0x01;
-const MS_GENERAL: u8 = 0x01;
-
-
-const MIDI_IN_SIZE: u8 = 0x06;
+//const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
 
 pub struct MidiClass<'a,B: UsbBus> {
