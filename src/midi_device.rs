@@ -1,5 +1,6 @@
 use usb_device::class_prelude::*;
 use usb_device::Result;
+use crate::notes::Note;
 
 pub const USB_CLASS_NONE : u8 = 0x00;
 const USB_AUDIO_CLASS: u8 = 0x01;
@@ -37,7 +38,8 @@ impl<B: UsbBus> MidiClass<'_, B> {
         }
     }
 
-    pub fn note_on(&mut self, chan: u8, note: u8, vel : u8) -> Result<usize> {
+    pub fn note_on(&mut self, chan: u8, note: Note, vel : u8) -> Result<usize> {
+        let note = note as u8;
         self.standard_bulkin.write(
             &[
                 0x09,//Note-on message (usb-midi)
@@ -47,7 +49,8 @@ impl<B: UsbBus> MidiClass<'_, B> {
             ])
     }
 
-      pub fn note_off(&mut self, chan: u8, note: u8, vel : u8) -> Result<usize> {
+      pub fn note_off(&mut self, chan: u8, note: Note, vel : u8) -> Result<usize> {
+        let note = note as u8;
         self.standard_bulkin.write(
             &[
                 0x08,//Note-on message (usb-midi)
