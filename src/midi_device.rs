@@ -6,6 +6,9 @@ use crate::usb_constants::*;
 //const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
 
+///Note we are using MidiIn here to refer to the fact that
+///The Host sees it as a midi in device
+///This class allows you to send data in
 pub struct MidiClass<'a,B: UsbBus> {
     standard_ac: InterfaceNumber,
     standard_mc: InterfaceNumber,
