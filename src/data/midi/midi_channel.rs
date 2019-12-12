@@ -2,20 +2,20 @@ use crate::util::try_from::{TryFrom};
 
 /// The MidiChannel is a value ranging from 0x0 to 0xF 
 /// This is a standard midi concept
+/// Note Channel1 = 0 on the wire
 #[derive(Debug)]
 #[repr(u8)]
 pub enum MidiChannel {
-    Channel0  = 0x0, Channel1  = 0x1, Channel2  = 0x2, Channel3  = 0x3,
-    Channel4  = 0x4, Channel5  = 0x5, Channel6  = 0x6, Channel7  = 0x7,
-    Channel8  = 0x8, Channel9  = 0x9, Channel10 = 0xA, Channel11 = 0xB,
-    Channel12 = 0xC, Channel13 = 0xD, Channel14 = 0xE, Channel15 = 0xF
+    Channel1  = 0x0, Channel2  = 0x1, Channel3  = 0x2, Channel4  = 0x3,
+    Channel5  = 0x4, Channel6  = 0x5, Channel7  = 0x6, Channel8  = 0x7,
+    Channel9  = 0x8, Channel10 = 0x9, Channel11 = 0xA, Channel12 = 0xB,
+    Channel13 = 0xC, Channel14 = 0xD, Channel15 = 0xE, Channel16 = 0xF
 }
 
 impl TryFrom<u8> for MidiChannel {
 
     fn try_from(value:u8) -> Option<Self> {
         match value {
-            x if x == MidiChannel::Channel0  as u8 => Some(MidiChannel::Channel0),
             x if x == MidiChannel::Channel1  as u8 => Some(MidiChannel::Channel1),
             x if x == MidiChannel::Channel2  as u8 => Some(MidiChannel::Channel2),
             x if x == MidiChannel::Channel3  as u8 => Some(MidiChannel::Channel3),
@@ -31,6 +31,7 @@ impl TryFrom<u8> for MidiChannel {
             x if x == MidiChannel::Channel13 as u8 => Some(MidiChannel::Channel13),
             x if x == MidiChannel::Channel14 as u8 => Some(MidiChannel::Channel14),
             x if x == MidiChannel::Channel15 as u8 => Some(MidiChannel::Channel15),
+            x if x == MidiChannel::Channel16 as u8 => Some(MidiChannel::Channel16),
             _ => None
         }
     }
@@ -60,21 +61,21 @@ mod tests {
     }
 
     channel_test! {
-            cable_0:  (MidiChannel::Channel0,0),
-            cable_1:  (MidiChannel::Channel1,1),
-            cable_2:  (MidiChannel::Channel2,2),
-            cable_3:  (MidiChannel::Channel3,3),
-            cable_4:  (MidiChannel::Channel4,4),
-            cable_5:  (MidiChannel::Channel5,5),
-            cable_6:  (MidiChannel::Channel6,6),
-            cable_7:  (MidiChannel::Channel7,7),
-            cable_8:  (MidiChannel::Channel8,8),
-            cable_9:  (MidiChannel::Channel9,9),
-            cable_10:  (MidiChannel::Channel10,10),
-            cable_11:  (MidiChannel::Channel11,11),
-            cable_12:  (MidiChannel::Channel12,12),
-            cable_13:  (MidiChannel::Channel13,13),
-            cable_14:  (MidiChannel::Channel14,14),
-            cable_15:  (MidiChannel::Channel15,15),
+            channel_1:   (MidiChannel::Channel1,0),
+            channel_2:   (MidiChannel::Channel2,1),
+            channel_3:   (MidiChannel::Channel3,2),
+            channel_4:   (MidiChannel::Channel4,3),
+            channel_5:   (MidiChannel::Channel5,4),
+            channel_6:   (MidiChannel::Channel6,5),
+            channel_7:   (MidiChannel::Channel7,6),
+            channel_8:   (MidiChannel::Channel8,7),
+            channel_9:   (MidiChannel::Channel9,8),
+            channel_10:  (MidiChannel::Channel10,9),
+            channel_11:  (MidiChannel::Channel11,10),
+            channel_12:  (MidiChannel::Channel12,11),
+            channel_13:  (MidiChannel::Channel13,12),
+            channel_14:  (MidiChannel::Channel14,13),
+            channel_15:  (MidiChannel::Channel15,14),
+            channel_16:  (MidiChannel::Channel16,15),
     }
 }

@@ -19,6 +19,13 @@ pub enum Note {
     C9 , Cs9 , D9 , Ds9 , E9 , F9 , Fs9 , G9 , Gs9
 }
 
+
+impl Into<u8> for Note {
+    fn into(self) -> u8 {
+        self as u8 
+    }
+}
+
 impl Note {
     #[allow(non_upper_case_globals)] pub const Db1m : Note = Note::Cs1m;
     #[allow(non_upper_case_globals)] pub const Eb1m : Note = Note::Ds1m;
