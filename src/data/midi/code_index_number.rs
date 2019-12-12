@@ -21,7 +21,6 @@ impl Into<u8> for CodeIndexNumber {
     }
 }
 
-
 impl CodeIndexNumber {
 
     /// Miscellaneous function codes. Reserved for future extensions

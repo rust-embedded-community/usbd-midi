@@ -2,6 +2,7 @@ use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::notes::Note;
 use crate::data::midi::midi_channel::MidiChannel;
+use crate::data::midi::midi_message::MidiMessage;
 
 /// A packet that communicates with the host
 /// Note that the payload seems fairly 'open'
