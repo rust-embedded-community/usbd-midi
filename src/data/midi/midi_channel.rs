@@ -1,4 +1,4 @@
-use crate::util::try_from::{TryFrom};
+use core::convert::TryFrom;
 
 /// The MidiChannel is a value ranging from 0x0 to 0xF 
 /// This is a standard midi concept
@@ -12,27 +12,29 @@ pub enum MidiChannel {
     Channel13 = 0xC, Channel14 = 0xD, Channel15 = 0xE, Channel16 = 0xF
 }
 
-impl TryFrom<u8> for MidiChannel {
+pub struct InvalidMidiChannel(u8);
 
-    fn try_from(value:u8) -> Option<Self> {
+impl TryFrom<u8> for MidiChannel {
+    type Error = InvalidMidiChannel;
+    fn try_from(value:u8) -> Result<Self,Self::Error> {
         match value {
-            x if x == MidiChannel::Channel1  as u8 => Some(MidiChannel::Channel1),
-            x if x == MidiChannel::Channel2  as u8 => Some(MidiChannel::Channel2),
-            x if x == MidiChannel::Channel3  as u8 => Some(MidiChannel::Channel3),
-            x if x == MidiChannel::Channel4  as u8 => Some(MidiChannel::Channel4),
-            x if x == MidiChannel::Channel5  as u8 => Some(MidiChannel::Channel5),
-            x if x == MidiChannel::Channel6  as u8 => Some(MidiChannel::Channel6),
-            x if x == MidiChannel::Channel7  as u8 => Some(MidiChannel::Channel7),
-            x if x == MidiChannel::Channel8  as u8 => Some(MidiChannel::Channel8),
-            x if x == MidiChannel::Channel9  as u8 => Some(MidiChannel::Channel9),
-            x if x == MidiChannel::Channel10 as u8 => Some(MidiChannel::Channel10),
-            x if x == MidiChannel::Channel11 as u8 => Some(MidiChannel::Channel11),
-            x if x == MidiChannel::Channel12 as u8 => Some(MidiChannel::Channel12),
-            x if x == MidiChannel::Channel13 as u8 => Some(MidiChannel::Channel13),
-            x if x == MidiChannel::Channel14 as u8 => Some(MidiChannel::Channel14),
-            x if x == MidiChannel::Channel15 as u8 => Some(MidiChannel::Channel15),
-            x if x == MidiChannel::Channel16 as u8 => Some(MidiChannel::Channel16),
-            _ => None
+            x if x == MidiChannel::Channel1  as u8 => Ok(MidiChannel::Channel1),
+            x if x == MidiChannel::Channel2  as u8 => Ok(MidiChannel::Channel2),
+            x if x == MidiChannel::Channel3  as u8 => Ok(MidiChannel::Channel3),
+            x if x == MidiChannel::Channel4  as u8 => Ok(MidiChannel::Channel4),
+            x if x == MidiChannel::Channel5  as u8 => Ok(MidiChannel::Channel5),
+            x if x == MidiChannel::Channel6  as u8 => Ok(MidiChannel::Channel6),
+            x if x == MidiChannel::Channel7  as u8 => Ok(MidiChannel::Channel7),
+            x if x == MidiChannel::Channel8  as u8 => Ok(MidiChannel::Channel8),
+            x if x == MidiChannel::Channel9  as u8 => Ok(MidiChannel::Channel9),
+            x if x == MidiChannel::Channel10 as u8 => Ok(MidiChannel::Channel10),
+            x if x == MidiChannel::Channel11 as u8 => Ok(MidiChannel::Channel11),
+            x if x == MidiChannel::Channel12 as u8 => Ok(MidiChannel::Channel12),
+            x if x == MidiChannel::Channel13 as u8 => Ok(MidiChannel::Channel13),
+            x if x == MidiChannel::Channel14 as u8 => Ok(MidiChannel::Channel14),
+            x if x == MidiChannel::Channel15 as u8 => Ok(MidiChannel::Channel15),
+            x if x == MidiChannel::Channel16 as u8 => Ok(MidiChannel::Channel16),
+            _ => Err(InvalidMidiChannel(value))
         }
     }
 

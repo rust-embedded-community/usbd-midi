@@ -1,16 +1,17 @@
-use crate::util::try_from::{TryFrom};
+use core::convert::TryFrom;
 
 /// The Code Index Number(CIN) indicates the classification 
 /// of the bytes in the MIDI_x fields
 pub struct CodeIndexNumber(u8);
- 
-impl TryFrom<u8> for CodeIndexNumber {
+pub struct InvalidCodeIndexNumber(u8);
 
-    fn try_from(value:u8) -> Option<Self> {
+impl TryFrom<u8> for CodeIndexNumber {
+    type Error = InvalidCodeIndexNumber;
+    fn try_from(value:u8) -> Result<Self,Self::Error> {
         if value > 0xF {
-            None
+            Err(InvalidCodeIndexNumber(value))
         } else {
-            Some(CodeIndexNumber(value))
+            Ok(CodeIndexNumber(value))
         }
     }
 }

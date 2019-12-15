@@ -1,4 +1,4 @@
-use crate::util::try_from::{TryFrom};
+use core::convert::TryFrom;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF 
 /// indicating the number assignment of the Embedded MIDI Jack associated 
@@ -11,28 +11,29 @@ pub enum CableNumber {
     Cable8  = 0x8, Cable9  = 0x9, Cable10 = 0xA, Cable11 = 0xB,
     Cable12 = 0xC, Cable13 = 0xD, Cable14 = 0xE, Cable15 = 0xF
 }
+pub struct InvalidCableNumber(u8);
 
 impl TryFrom<u8> for CableNumber {
-
-    fn try_from(value:u8) -> Option<Self> {
+    type Error = InvalidCableNumber;
+    fn try_from(value:u8) -> Result<Self,Self::Error> {
         match value {
-            x if x == CableNumber::Cable0  as u8 => Some(CableNumber::Cable0),
-            x if x == CableNumber::Cable1  as u8 => Some(CableNumber::Cable1),
-            x if x == CableNumber::Cable2  as u8 => Some(CableNumber::Cable2),
-            x if x == CableNumber::Cable3  as u8 => Some(CableNumber::Cable3),
-            x if x == CableNumber::Cable4  as u8 => Some(CableNumber::Cable4),
-            x if x == CableNumber::Cable5  as u8 => Some(CableNumber::Cable5),
-            x if x == CableNumber::Cable6  as u8 => Some(CableNumber::Cable6),
-            x if x == CableNumber::Cable7  as u8 => Some(CableNumber::Cable7),
-            x if x == CableNumber::Cable8  as u8 => Some(CableNumber::Cable8),
-            x if x == CableNumber::Cable9  as u8 => Some(CableNumber::Cable9),
-            x if x == CableNumber::Cable10 as u8 => Some(CableNumber::Cable10),
-            x if x == CableNumber::Cable11 as u8 => Some(CableNumber::Cable11),
-            x if x == CableNumber::Cable12 as u8 => Some(CableNumber::Cable12),
-            x if x == CableNumber::Cable13 as u8 => Some(CableNumber::Cable13),
-            x if x == CableNumber::Cable14 as u8 => Some(CableNumber::Cable14),
-            x if x == CableNumber::Cable15 as u8 => Some(CableNumber::Cable15),
-            _ => None
+            x if x == CableNumber::Cable0  as u8 => Ok(CableNumber::Cable0),
+            x if x == CableNumber::Cable1  as u8 => Ok(CableNumber::Cable1),
+            x if x == CableNumber::Cable2  as u8 => Ok(CableNumber::Cable2),
+            x if x == CableNumber::Cable3  as u8 => Ok(CableNumber::Cable3),
+            x if x == CableNumber::Cable4  as u8 => Ok(CableNumber::Cable4),
+            x if x == CableNumber::Cable5  as u8 => Ok(CableNumber::Cable5),
+            x if x == CableNumber::Cable6  as u8 => Ok(CableNumber::Cable6),
+            x if x == CableNumber::Cable7  as u8 => Ok(CableNumber::Cable7),
+            x if x == CableNumber::Cable8  as u8 => Ok(CableNumber::Cable8),
+            x if x == CableNumber::Cable9  as u8 => Ok(CableNumber::Cable9),
+            x if x == CableNumber::Cable10 as u8 => Ok(CableNumber::Cable10),
+            x if x == CableNumber::Cable11 as u8 => Ok(CableNumber::Cable11),
+            x if x == CableNumber::Cable12 as u8 => Ok(CableNumber::Cable12),
+            x if x == CableNumber::Cable13 as u8 => Ok(CableNumber::Cable13),
+            x if x == CableNumber::Cable14 as u8 => Ok(CableNumber::Cable14),
+            x if x == CableNumber::Cable15 as u8 => Ok(CableNumber::Cable15),
+            _ => Err(InvalidCableNumber(value))
         }
     }
 
