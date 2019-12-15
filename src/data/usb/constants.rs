@@ -1,3 +1,4 @@
+//This should be better organized in future
 
 pub const USB_CLASS_NONE : u8 = 0x00;
 pub const USB_AUDIO_CLASS: u8 = 0x01;

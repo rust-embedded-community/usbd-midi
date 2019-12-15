@@ -1,9 +1,9 @@
 use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::notes::Note;
-use crate::data::midi::midi_channel::MidiChannel;
-use crate::data::midi::midi_message::MidiMessage;
-use crate::data::midi::midi_velocity::MidiVelocity;
+use crate::data::midi::channel::Channel;
+use crate::data::midi::message::MidiMessage;
+use crate::data::midi::velocity::Velocity;
 use crate::util::nibble::{combine_nibble};
 
 /// A packet that communicates with the host
@@ -18,9 +18,9 @@ pub struct UsbMidiEventPacket {
 
 /// Constructs a note-on midi message given the cable, note and velocity
 pub fn note_on( cable:CableNumber,
-                channel: MidiChannel,
+                channel: Channel,
                 note:Note, 
-                velocity: MidiVelocity) -> UsbMidiEventPacket {
+                velocity: Velocity) -> UsbMidiEventPacket {
     let message = MidiMessage::note_on(channel,note,velocity);              
 
     UsbMidiEventPacket{
