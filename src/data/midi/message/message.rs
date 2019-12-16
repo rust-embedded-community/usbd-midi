@@ -2,46 +2,63 @@
 use crate::data::midi::channel::Channel;
 use crate::data::midi::velocity::Velocity;
 use crate::data::midi::notes::Note;
+use crate::data::byte::u7::U7;
+use crate::data::midi::message::raw::{Raw,Payload};
 
-pub enum Mode  {Mode}
-
-pub enum RealTime {}
-pub enum Common {}
-pub enum SysEx {}
-
-pub enum System {
-    RealTime(RealTime),
-    Common(Common),
-    SysEx(SysEx)
-}
-
+/// Represents midi messages
+/// Note: not current exhaustive and SysEx messages end up
+/// being a confusing case. So are currently note implemented 
+/// they are sort-of unbounded
 pub enum Message {
-    Channel(Channel),
-    System(System)
+    NoteOff(Channel,Note,Velocity),
+    NoteOn(Channel,Note,Velocity),
+    PolyphonicAftertouch(Channel,Note,U7),
+    ProgramChange(Channel,U7),
+    ChannelAftertouch(Channel,U7),
+    PitchWheelChange(Channel,U7,U7),
 }
 
-pub struct MidiMessage {
-    payload: [u8;3]
-}
+const NOTE_OFF_MASK             :u8 = 0b1000_0000;
+const NOTE_ON_MASK              :u8 = 0b1001_0000;
+const POLYPHONIC_MASK           :u8 = 0b1010_0000;
+const PROGRAM_MASK              :u8 = 0b1100_0000;
+const CHANNEL_AFTERTOUCH_MASK   :u8 = 0b1101_0000;
+const PITCH_BEND_MASK           :u8 = 0b1110_0000;
 
-
-
-impl MidiMessage {
-    pub fn note_on(channel:Channel, note:Note, velocity:Velocity) 
-                                                            -> MidiMessage{
-        let channel : u8 = channel.into();
-        let note : u8 = note.into();   
-        let velocity : u8 = velocity.into();                                                             
-        MidiMessage {
-            payload: [channel,note,velocity]
+impl From<Message> for Raw {
+    fn from(value:Message) -> Raw {
+        match value {
+            Message::NoteOn(chan,note,vel)  =>  {
+                let payload = Payload::DoubleByte(note.into(),vel.into());
+                let status =  NOTE_ON_MASK | u8::from(chan);
+                Raw { status, payload  }
+            },
+            Message::NoteOff(chan,note,vel) => {
+                let payload = Payload::DoubleByte(note.into(),vel.into());
+                let status = NOTE_OFF_MASK | u8::from(chan);
+                Raw {status, payload}
+            },
+            Message::PolyphonicAftertouch(chan,note,pressure) => {
+                let payload = Payload::DoubleByte(note.into(),pressure.into());
+                let status = POLYPHONIC_MASK | u8::from(chan);
+                Raw {status, payload}
+            },
+            Message::ProgramChange(chan,program) => {
+                let payload = Payload::SingleByte(u8::from(program));
+                let status = PROGRAM_MASK | u8::from(chan);
+                Raw {status, payload}
+            },
+            Message::ChannelAftertouch(chan,pressure) => {
+                let payload = Payload::SingleByte(u8::from(pressure));
+                let status = CHANNEL_AFTERTOUCH_MASK | u8::from(chan);
+                Raw {status, payload}
+            },
+            Message::PitchWheelChange(chan,lsb,msb) => {
+                let payload = Payload::DoubleByte(u8::from(lsb),u8::from(msb));
+                let status = PITCH_BEND_MASK | u8::from(chan);
+                Raw {status , payload}
+            }
+                
         }
-    }
-}
-
-impl Into<[u8;3]> for MidiMessage {
-    /// Converts the midi packet into a byte array
-    /// suitable for transfer via usb
-    fn into(self) -> [u8;3] {
-        self.payload
     }
 }

@@ -40,9 +40,9 @@ impl TryFrom<u8> for Channel {
 
 }
 
-impl Into<u8> for Channel {
-    fn into(self) -> u8 {
-        self as u8
+impl From<Channel> for u8 {
+    fn from(src:Channel) -> u8 {
+        src as u8
     }
 }
 

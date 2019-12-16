@@ -2,9 +2,10 @@ use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::notes::Note;
 use crate::data::midi::channel::Channel;
-use crate::data::midi::message::MidiMessage;
+use crate::data::midi::message::Message;
 use crate::data::midi::velocity::Velocity;
 use crate::util::nibble::{combine_nibble};
+use crate::data::midi::message::raw::Raw;
 
 /// A packet that communicates with the host
 /// Note that the payload seems fairly 'open'
@@ -12,8 +13,9 @@ use crate::util::nibble::{combine_nibble};
 /// but may not!?
 pub struct UsbMidiEventPacket {
     cable_number : CableNumber,
-    code_index_number: CodeIndexNumber,
-    message: MidiMessage
+    code_index_number: CodeIndexNumber, //Is this strictly necessary 
+                                        //if can be built from the midi message?
+    message: Message
 }
 
 /// Constructs a note-on midi message given the cable, note and velocity
@@ -21,7 +23,9 @@ pub fn note_on( cable:CableNumber,
                 channel: Channel,
                 note:Note, 
                 velocity: Velocity) -> UsbMidiEventPacket {
-    let message = MidiMessage::note_on(channel,note,velocity);              
+
+
+    let message = Message::NoteOn(channel,note,velocity);              
 
     UsbMidiEventPacket{
         cable_number : cable,
@@ -31,17 +35,16 @@ pub fn note_on( cable:CableNumber,
 }
 impl Into<[u8;4]> for UsbMidiEventPacket {
     /// Converts the midi packet into a byte array
-    /// suitable for transfer via usb
+    /// suitable for transfer via usbgit 
     fn into(self) -> [u8;4] {
         let cable_number : u8 = self.cable_number.into();
         let index_number : u8 = self.code_index_number.into();
         let header = combine_nibble(cable_number,index_number);
-        let payload : [u8;3]= self.message.into();
-        [   header,
-            payload[0],
-            payload[1],
-            payload[2]
-        ]
+
+        let raw : Raw = self.message.into();
+        let status : u8 = raw.status.into();
+        
+        panic!()
     }
 }
 

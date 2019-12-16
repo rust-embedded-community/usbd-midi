@@ -1,4 +1,4 @@
-pub mod channel;
+pub mod voice;
 pub mod message;
-
-pub use crate::data::midi::message::message::{MidiMessage};
+pub mod raw;
+pub use crate::data::midi::message::message::{Message};
