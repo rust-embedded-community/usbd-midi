@@ -1,4 +1,5 @@
 use core::convert::TryFrom;
+use crate::data::byte::u4::U4;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF 
 /// indicating the number assignment of the Embedded MIDI Jack associated 
@@ -39,9 +40,15 @@ impl TryFrom<u8> for CableNumber {
 
 }
 
-impl Into<u8> for CableNumber {
-    fn into(self) -> u8 {
-        self as u8
+impl From<CableNumber> for u8{
+    fn from(value:CableNumber) -> u8 {
+        value as u8
+    }
+}
+
+impl From<CableNumber> for U4{
+    fn from(value:CableNumber) -> U4 {
+        U4::from_overflowing_u8(u8::from(value))
     }
 }
 
@@ -55,7 +62,7 @@ mod tests {
                 #[test]
                 fn $id() {
                     let (input,expected) = $value;
-                    assert_eq!(input as u8, expected);
+                    assert_eq!(u8::from(input), expected);
                 }
             )*
         }

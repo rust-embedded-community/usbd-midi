@@ -1,4 +1,6 @@
 use core::convert::TryFrom;
+use crate::data::midi::message::Message;
+use crate::data::byte::u4::U4;
 
 /// The Code Index Number(CIN) indicates the classification 
 /// of the bytes in the MIDI_x fields
@@ -16,11 +18,13 @@ impl TryFrom<u8> for CodeIndexNumber {
     }
 }
 
-impl Into<u8> for CodeIndexNumber {
-    fn into(self) -> u8 {
-        self.0
+impl From<CodeIndexNumber> for U4{
+    fn from(value:CodeIndexNumber) -> U4{
+        U4::from_overflowing_u8(value.0)
     }
 }
+
+
 
 impl CodeIndexNumber {
 
@@ -60,4 +64,14 @@ impl CodeIndexNumber {
     /// Single Byte
     pub const SINGLE_BYTE : CodeIndexNumber= CodeIndexNumber(0xF);
  
+    pub fn find_from_message(value:&Message) -> CodeIndexNumber{
+        match value {
+            Message::NoteOn(_,_,_) => CodeIndexNumber::NOTE_ON,
+            Message::NoteOff(_,_,_) => CodeIndexNumber::NOTE_OFF,
+            Message::ChannelAftertouch(_,_) => CodeIndexNumber::CHANNEL_PRESSURE,
+            Message::PitchWheelChange(_,_,_) => CodeIndexNumber::PITCHBEND_CHANGE,
+            Message::PolyphonicAftertouch(_,_,_) => CodeIndexNumber::POLY_KEYPRESS,
+            Message::ProgramChange(_,_) => CodeIndexNumber::PROGRAM_CHANGE
+        }
+    }
 }

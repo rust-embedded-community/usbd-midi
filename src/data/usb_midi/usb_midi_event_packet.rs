@@ -1,50 +1,35 @@
 use crate::data::usb_midi::cable_number::CableNumber;
-use crate::data::midi::code_index_number::CodeIndexNumber;
-use crate::data::midi::notes::Note;
-use crate::data::midi::channel::Channel;
+use crate::data::usb_midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::message::Message;
-use crate::data::midi::velocity::Velocity;
-use crate::util::nibble::{combine_nibble};
-use crate::data::midi::message::raw::Raw;
+use crate::data::byte::u4::U4;
+use crate::data::midi::message::raw::{Payload,Raw};
 
 /// A packet that communicates with the host
-/// Note that the payload seems fairly 'open'
-/// It's contents can depend on the cable/code index number
-/// but may not!?
+/// Currently supported is sending the specified normal midi
+/// message over the supplied cable number
 pub struct UsbMidiEventPacket {
     cable_number : CableNumber,
-    code_index_number: CodeIndexNumber, //Is this strictly necessary 
-                                        //if can be built from the midi message?
     message: Message
 }
 
-/// Constructs a note-on midi message given the cable, note and velocity
-pub fn note_on( cable:CableNumber,
-                channel: Channel,
-                note:Note, 
-                velocity: Velocity) -> UsbMidiEventPacket {
+impl From<UsbMidiEventPacket> for [u8;4] {
+    fn from(value:UsbMidiEventPacket) -> [u8;4] {
+        let message= value.message;
+        let cable_number = U4::from(value.cable_number);
+        let index_number = {
+                let code_index = 
+                        CodeIndexNumber::find_from_message(&message);
+                U4::from(code_index)
+        };
+        let header = U4::combine(cable_number,index_number);
 
+        let raw_midi = Raw::from(message);
+        let status = raw_midi.status;
 
-    let message = Message::NoteOn(channel,note,velocity);              
-
-    UsbMidiEventPacket{
-        cable_number : cable,
-        code_index_number : CodeIndexNumber::NOTE_ON,
-        message : message
+        match raw_midi.payload {
+            Payload::Empty => [header,status,0,0],
+            Payload::SingleByte(byte) => [header,status,byte,0],
+            Payload::DoubleByte(byte1,byte2) => [header,status,byte1,byte2]           
+        }
     }
 }
-impl Into<[u8;4]> for UsbMidiEventPacket {
-    /// Converts the midi packet into a byte array
-    /// suitable for transfer via usbgit 
-    fn into(self) -> [u8;4] {
-        let cable_number : u8 = self.cable_number.into();
-        let index_number : u8 = self.code_index_number.into();
-        let header = combine_nibble(cable_number,index_number);
-
-        let raw : Raw = self.message.into();
-        let status : u8 = raw.status.into();
-        
-        panic!()
-    }
-}
-

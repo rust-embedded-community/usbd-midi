@@ -1,6 +1,5 @@
 use usb_device::class_prelude::*;
 use usb_device::Result;
-use crate::data::midi::notes::Note;
 use crate::data::usb::constants::*;
 use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
 
@@ -32,28 +31,6 @@ impl<B: UsbBus> MidiClass<'_, B> {
     pub fn send_message(&mut self, usb_midi:UsbMidiEventPacket) -> Result<usize> {
         let bytes : [u8;4] = usb_midi.into();
         self.standard_bulkin.write(&bytes)
-    }
-
-    pub fn note_on(&mut self, chan: u8, note: Note, vel : u8) -> Result<usize> {
-        let note = note as u8;
-        self.standard_bulkin.write(
-            &[
-                0x09,//Note-on message (usb-midi)
-                0x90 | (chan & 0x0f),// (note-on, normal midi)
-                note & 0x7f, //note
-                vel & 0x7f //vel
-            ])
-    }
-
-      pub fn note_off(&mut self, chan: u8, note: Note, vel : u8) -> Result<usize> {
-        let note = note as u8;
-        self.standard_bulkin.write(
-            &[
-                0x08,//Note-on message (usb-midi)
-                0x80 | (chan & 0x0f),// (note-on, normal midi)
-                note & 0x7f, //note
-                vel & 0x7f //vel
-            ])
     }
 
 }
