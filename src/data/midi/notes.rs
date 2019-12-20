@@ -1,4 +1,5 @@
-
+use crate::data::byte::u7::U7;
+use crate::data::byte::from_traits::FromOverFlow;
 /// A simple enum type that represents all the midi 'notes'
 /// note the flat versions are associated constants
 /// but can be referenced like Note::Bb3
@@ -25,6 +26,14 @@ impl Into<u8> for Note {
         self as u8 
     }
 }
+
+impl From<Note> for U7 {
+    fn from(value:Note) -> U7{
+        let byte = value as u8;
+        U7::from_overflow(byte)
+    }
+}
+
 
 impl Note {
     #[allow(non_upper_case_globals)] pub const Db1m : Note = Note::Cs1m;

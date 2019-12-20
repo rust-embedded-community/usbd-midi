@@ -26,7 +26,7 @@ impl From<U4> for u8 {
 
 impl U4 {
     pub const MAX: U4= U4(0x0F);
-    pub const MIN: U4 = U4(0);
+    pub const MIN: U4= U4(0);
 
     /// Combines two nibbles (u4) eg half byte
     /// result will be a full byte

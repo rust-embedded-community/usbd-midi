@@ -28,8 +28,10 @@ impl From<UsbMidiEventPacket> for [u8;4] {
 
         match raw_midi.payload {
             Payload::Empty => [header,status,0,0],
-            Payload::SingleByte(byte) => [header,status,byte,0],
-            Payload::DoubleByte(byte1,byte2) => [header,status,byte1,byte2]           
+            Payload::SingleByte(byte) => 
+                                [header,status,byte.into(),0],
+            Payload::DoubleByte(byte1,byte2) => 
+                                    [header,status,byte1.into(),byte2.into()]           
         }
     }
 }

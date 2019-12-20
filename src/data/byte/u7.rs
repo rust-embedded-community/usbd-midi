@@ -1,4 +1,5 @@
 use core::convert::TryFrom;
+use crate::data::byte::from_traits::{FromOverFlow,FromClamped};
 
 /// A primitive value that can be from 0-0x7F
 pub struct U7(u8);
@@ -24,7 +25,25 @@ impl From<U7> for u8 {
     }
 }
 
+impl FromOverFlow<u8> for U7 {
+    fn from_overflow(value:u8) -> U7 {
+        const MASK :u8 = 0b0111_1111;
+        let value = MASK & value;
+        U7(value)
+    }
+}
+
+impl FromClamped<u8> for U7{
+    fn from_clamped(value:u8) -> U7{
+        match U7::try_from(value) {
+            Ok(x) => x,
+            _ => U7::MAX
+        }
+    }
+}
+
 impl U7 {
     pub const MAX: U7= U7(0x7F);
     pub const MIN: U7 = U7(0);
+
 }

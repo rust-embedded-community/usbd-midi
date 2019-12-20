@@ -1,8 +1,10 @@
+use crate::data::byte::u7::U7;
+
 /// Represents the payloads that the midi message may contain
 pub enum Payload {
     Empty,
-    SingleByte(u8),
-    DoubleByte(u8,u8)
+    SingleByte(U7),
+    DoubleByte(U7,U7)
 }
 
 /// A struct that captures the valid states
