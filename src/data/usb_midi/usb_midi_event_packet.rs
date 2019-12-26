@@ -8,8 +8,8 @@ use crate::data::midi::message::raw::{Payload,Raw};
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
 pub struct UsbMidiEventPacket {
-    cable_number : CableNumber,
-    message: Message
+    pub cable_number : CableNumber,
+    pub message: Message
 }
 
 impl From<UsbMidiEventPacket> for [u8;4] {
