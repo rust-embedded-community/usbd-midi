@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 embedded-hal = "0.2.2"
 nb = "0.1.2"
-usb-device = {version = "0.2.3"}  
+usb-device = "0.2.3"
