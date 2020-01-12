@@ -3,7 +3,7 @@ use core::convert::TryFrom;
 /// The Channel is a value ranging from 0x0 to 0xF 
 /// This is a standard midi concept
 /// Note Channel1 = 0 on the wire
-#[derive(Debug)]
+#[derive(Debug,Copy,Clone)]
 #[repr(u8)]
 pub enum Channel {
     Channel1  = 0x0, Channel2  = 0x1, Channel3  = 0x2, Channel4  = 0x3,

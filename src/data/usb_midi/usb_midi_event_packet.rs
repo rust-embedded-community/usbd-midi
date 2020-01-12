@@ -4,6 +4,7 @@ use crate::data::midi::message::Message;
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload,Raw};
 
+
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
@@ -32,6 +33,17 @@ impl From<UsbMidiEventPacket> for [u8;4] {
                                 [header,status,byte.into(),0],
             Payload::DoubleByte(byte1,byte2) => 
                                     [header,status,byte1.into(),byte2.into()]           
+        }
+    }
+}
+
+impl UsbMidiEventPacket{
+
+    pub fn from_midi(cable:CableNumber, midi:Message)
+        -> UsbMidiEventPacket{
+        UsbMidiEventPacket{
+            cable_number : cable,
+            message : midi
         }
     }
 }
