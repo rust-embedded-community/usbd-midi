@@ -1,10 +1,14 @@
 use usb_device::class_prelude::*;
 use usb_device::Result;
 use crate::data::usb::constants::*;
-use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
+use crate::data::usb_midi::usb_midi_event_packet::{UsbMidiEventPacket, MidiPacketParsingError};
+use core::convert::TryFrom;
 
-//const MIDI_IN_SIZE: u8 = 0x06;
+const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
+
+pub const MIDI_PACKET_SIZE: usize = 4;
+pub const MAX_PACKET_SIZE: usize = 64;
 
 ///Note we are using MidiIn here to refer to the fact that
 ///The Host sees it as a midi in device
@@ -12,10 +16,14 @@ const MIDI_OUT_SIZE: u8 = 0x09;
 pub struct MidiClass<'a,B: UsbBus> {
     standard_ac: InterfaceNumber,
     standard_mc: InterfaceNumber,
-    //standard_bulkout: EndpointOut<'a, B>,
+    standard_bulkout: EndpointOut<'a, B>,
     standard_bulkin: EndpointIn<'a,B>
 }
 
+pub enum MidiReadError {
+    ParsingFailed(MidiPacketParsingError),
+    UsbError(UsbError)
+}
 
 impl<B: UsbBus> MidiClass<'_, B> {
     /// Creates a new MidiClass with the provided UsbBus
@@ -23,16 +31,19 @@ impl<B: UsbBus> MidiClass<'_, B> {
         MidiClass {
             standard_ac: alloc.interface(),
             standard_mc: alloc.interface(),
-            //standard_bulkout : alloc.bulk(64),
-            standard_bulkin: alloc.bulk(64)
+            standard_bulkout : alloc.bulk(MAX_PACKET_SIZE as u16),
+            standard_bulkin: alloc.bulk(MAX_PACKET_SIZE as u16)
         }
     }
 
     pub fn send_message(&mut self, usb_midi:UsbMidiEventPacket) -> Result<usize> {
-        let bytes : [u8;4] = usb_midi.into();
+        let bytes : [u8;MIDI_PACKET_SIZE] = usb_midi.into();
         self.standard_bulkin.write(&bytes)
     }
 
+    pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize> {
+        self.standard_bulkout.read(buffer)
+    }
 }
 
 impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
@@ -82,7 +93,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
     
         //JACKS
 
-/*         writer.write(
+        writer.write(
             CS_INTERFACE,
             &[
                 MIDI_IN_JACK_SUBTYPE,
@@ -90,7 +101,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 0x01, // id
                 0x00
             ]
-        )?; */
+        )?;
 
         writer.write (
             CS_INTERFACE,
@@ -105,7 +116,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
             ]
         )?;
 
-/*         writer.endpoint(&self.standard_bulkout)?;
+        writer.endpoint(&self.standard_bulkout)?;
 
         writer.write(
             CS_ENDPOINT,
@@ -114,7 +125,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 0x01,
                 0x01
             ]
-        )?; */
+        )?;
 
         writer.endpoint(&self.standard_bulkin)?;
 

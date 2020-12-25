@@ -3,11 +3,18 @@ use crate::data::usb_midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::message::Message;
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload,Raw};
+use crate::data::byte::u4;
+use core::convert::TryFrom;
+use crate::data::midi::channel::Channel::Channel1;
+use crate::data::midi::notes::Note::C7;
+use crate::data::byte::u7::U7;
+use crate::data::byte::from_traits::FromClamped;
 
 
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
+#[derive(Debug)]
 pub struct UsbMidiEventPacket {
     pub cable_number : CableNumber,
     pub message: Message
@@ -34,6 +41,34 @@ impl From<UsbMidiEventPacket> for [u8;4] {
             Payload::DoubleByte(byte1,byte2) => 
                                     [header,status,byte1.into(),byte2.into()]           
         }
+    }
+}
+
+#[derive(Debug)]
+pub enum MidiPacketParsingError {
+    InvalidNote(u8),
+    InvalidCableNumber(u8),
+    InvalidEventType(u8),
+    MissingDataPacket
+}
+
+impl TryFrom<&[u8]> for UsbMidiEventPacket {
+    type Error = MidiPacketParsingError;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let raw_cable_number= value[0] >> 4;
+
+        let cable_number = match CableNumber::try_from(u8::from(raw_cable_number)) {
+            Ok(val) => val,
+            _ => return Err(MidiPacketParsingError::InvalidCableNumber(raw_cable_number))
+        };
+
+        let message = Message::try_from(&value[1..])?;
+
+        Ok(UsbMidiEventPacket {
+            cable_number,
+            message
+        })
     }
 }
 
