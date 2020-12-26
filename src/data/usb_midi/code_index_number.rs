@@ -71,7 +71,8 @@ impl CodeIndexNumber {
             Message::ChannelAftertouch(_,_) => CodeIndexNumber::CHANNEL_PRESSURE,
             Message::PitchWheelChange(_,_,_) => CodeIndexNumber::PITCHBEND_CHANGE,
             Message::PolyphonicAftertouch(_,_,_) => CodeIndexNumber::POLY_KEYPRESS,
-            Message::ProgramChange(_,_) => CodeIndexNumber::PROGRAM_CHANGE
+            Message::ProgramChange(_,_) => CodeIndexNumber::PROGRAM_CHANGE,
+            Message::ControlChange(_,_,_) => CodeIndexNumber::CONTROL_CHANGE
         }
     }
 }
