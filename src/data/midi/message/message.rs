@@ -6,9 +6,9 @@ use crate::data::midi::message::raw::{Raw,Payload};
 use crate::data::byte::from_traits::FromClamped;
 use core::convert::TryFrom;
 use crate::data::usb_midi::usb_midi_event_packet::MidiPacketParsingError;
+use crate::data::midi::message::control_function::ControlFunction;
 
 type Velocity = U7;
-type ControllerNumber = U7;
 
 /// Represents midi messages
 /// Note: not current exhaustive and SysEx messages end up
@@ -22,7 +22,7 @@ pub enum Message {
     ProgramChange(Channel,U7),
     ChannelAftertouch(Channel,U7),
     PitchWheelChange(Channel,U7,U7),
-    ControlChange(Channel, ControllerNumber, U7)
+    ControlChange(Channel,ControlFunction,U7)
 }
 
 const NOTE_OFF_MASK              :u8 = 0b1000_0000;
@@ -66,8 +66,8 @@ impl From<Message> for Raw {
                 let status = PITCH_BEND_MASK | u8::from(chan);
                 Raw {status , payload}
             },
-            Message::ControlChange(chan, controller_number, value) => {
-                let payload = Payload::DoubleByte(controller_number, value);
+            Message::ControlChange(chan, control_function, value) => {
+                let payload = Payload::DoubleByte(control_function.0, value);
                 let status = CONTROL_CHANGE_MASK | u8::from(chan);
                 Raw {status, payload}
             }
@@ -91,7 +91,7 @@ impl<'a> TryFrom<&'a [u8]> for Message {
             PROGRAM_MASK => Ok(Message::ProgramChange(channel, get_u7_at(data, 1)?)),
             CHANNEL_AFTERTOUCH_MASK => Ok(Message::ChannelAftertouch(channel, get_u7_at(data, 1)?)),
             PITCH_BEND_MASK => Ok(Message::PitchWheelChange(channel, get_u7_at(data, 1)?, get_u7_at(data, 2)?)),
-            CONTROL_CHANGE_MASK => Ok(Message::ControlChange(channel, get_u7_at(data, 1)?, get_u7_at(data, 2)?)),
+            CONTROL_CHANGE_MASK => Ok(Message::ControlChange(channel, ControlFunction(get_u7_at(data, 1)?), get_u7_at(data, 2)?)),
             _ => Err(MidiPacketParsingError::InvalidEventType(event_type))
         }
     }
