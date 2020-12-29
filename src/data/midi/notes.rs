@@ -5,7 +5,7 @@ use num_enum::TryFromPrimitive;
 /// note the flat versions are associated constants
 /// but can be referenced like Note::Bb3
 /// C1m is the C-1
-#[derive(Debug,Copy,Clone,TryFromPrimitive)]
+#[derive(Debug,Copy,Clone,TryFromPrimitive,Eq,PartialEq)]
 #[repr(u8)]
 pub enum Note {
     C1m, Cs1m, D1m, Ds1m, E1m, F1m, Fs1m, G1m, Gs1m, A1m, As1m, B1m,

@@ -9,7 +9,7 @@ use core::convert::TryFrom;
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
-#[derive(Debug)]
+#[derive(Debug,Eq, PartialEq)]
 pub struct UsbMidiEventPacket {
     pub cable_number : CableNumber,
     pub message: Message
@@ -83,5 +83,61 @@ impl UsbMidiEventPacket{
             cable_number : cable,
             message : midi
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use core::convert::TryFrom;
+    use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
+    use crate::data::midi::channel::Channel::{Channel1, Channel2};
+    use crate::data::midi::notes::Note;
+    use crate::data::byte::u7::U7;
+    use crate::data::midi::message::Message;
+    use crate::data::usb_midi::cable_number::CableNumber::{Cable0,Cable1};
+    use crate::data::midi::message::control_function::ControlFunction;
+
+    macro_rules! decode_message_test {
+        ($($id:ident:$value:expr,)*) => {
+            $(
+                #[test]
+                fn $id() {
+                    let (usb_midi_data_packet,expected) = $value;
+                    let message = UsbMidiEventPacket::try_from(&usb_midi_data_packet[..]).unwrap();
+                    assert_eq!(expected, message);
+                }
+            )*
+        }
+    }
+
+    decode_message_test! {
+        note_on: ([9, 144, 36, 127], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::NoteOn(Channel1, Note::C2, U7(127))
+        }),
+        note_off: ([8, 128, 36, 0], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::NoteOff(Channel1, Note::C2, U7(0))
+        }),
+        polyphonic_aftertouch: ([10, 160, 36, 64], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64))
+        }),
+        program_change: ([28, 192, 127, 0], UsbMidiEventPacket {
+            cable_number: Cable1,
+            message: Message::ProgramChange(Channel1, U7(127))
+        }),
+        channel_aftertouch: ([13, 208, 127, 0], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::ChannelAftertouch(Channel1, U7(127))
+        }),
+        pitch_wheel: ([14, 224, 64, 32], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::PitchWheelChange(Channel1, U7(64), U7(32))
+        }),
+        control_change: ([11, 177, 1, 32], UsbMidiEventPacket {
+            cable_number: Cable0,
+            message: Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32))
+        }),
     }
 }

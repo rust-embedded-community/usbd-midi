@@ -14,7 +14,7 @@ type Velocity = U7;
 /// Note: not current exhaustive and SysEx messages end up
 /// being a confusing case. So are currently note implemented 
 /// they are sort-of unbounded
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Message {
     NoteOff(Channel,Note,Velocity),
     NoteOn(Channel,Note,Velocity),
