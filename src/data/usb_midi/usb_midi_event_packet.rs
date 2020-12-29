@@ -3,12 +3,7 @@ use crate::data::usb_midi::code_index_number::CodeIndexNumber;
 use crate::data::midi::message::Message;
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload,Raw};
-use crate::data::byte::u4;
 use core::convert::TryFrom;
-use crate::data::midi::channel::Channel::Channel1;
-use crate::data::midi::notes::Note::C7;
-use crate::data::byte::u7::U7;
-use crate::data::byte::from_traits::FromClamped;
 
 
 /// A packet that communicates with the host
