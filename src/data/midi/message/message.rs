@@ -78,7 +78,11 @@ impl From<Message> for Raw {
 impl<'a> TryFrom<&'a [u8]> for Message {
     type Error = MidiPacketParsingError;
     fn try_from(data: &[u8]) -> Result<Self, Self::Error> {
-        let status_byte = data[0];
+        let status_byte = match data.get(0) {
+            Some(byte) => byte,
+            None => return Err(MidiPacketParsingError::MissingDataPacket)
+        };
+
         let event_type = status_byte & 0b1111_0000;
         let channel_bytes = (status_byte) & 0b0000_1111;
 
