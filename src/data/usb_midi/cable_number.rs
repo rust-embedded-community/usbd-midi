@@ -4,7 +4,7 @@ use crate::data::byte::u4::U4;
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF 
 /// indicating the number assignment of the Embedded MIDI Jack associated 
 /// with the endpoint that is transferring the data
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug,Clone,Copy,Eq, PartialEq)]
 #[repr(u8)]
 pub enum CableNumber {
     Cable0  = 0x0, Cable1  = 0x1, Cable2  = 0x2, Cable3  = 0x3,
