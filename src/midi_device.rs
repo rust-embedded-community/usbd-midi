@@ -4,7 +4,7 @@ use crate::data::usb::constants::*;
 use crate::data::usb_midi::usb_midi_event_packet::{UsbMidiEventPacket, MidiPacketParsingError};
 
 const MIDI_IN_SIZE: u8 = 0x06;
-const MIDI_OUT_SIZE: u8 = 0x09;
+const MIDI_OUT_SIZE: u8 = 0x07;
 
 pub const MIDI_PACKET_SIZE: usize = 4;
 pub const MAX_PACKET_SIZE: usize = 64;
@@ -133,9 +133,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                     MIDI_OUT_JACK_SUBTYPE,
                     EMBEDDED,
                     self.out_jack_id(i), //id
-                    0x01, // 1 pin
-                    self.in_jack_id(i), // pin 1
-                    0x01, //sorta vague source pin?
+                    0x00, // no pins
                     0x00
                 ]
             )?;
