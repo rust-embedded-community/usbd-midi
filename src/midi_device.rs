@@ -34,7 +34,7 @@ impl<B: UsbBus> MidiClass<'_, B> {
     /// depending on the terminology).
     /// Note that a maximum of 16 in and 16 out jacks are supported.
     pub fn new(alloc: &UsbBusAllocator<B>, n_in_jacks: u8, n_out_jacks: u8) -> core::result::Result<MidiClass<'_, B>, InvalidArguments>  {
-        if n_in_jacks >= 16 || n_out_jacks >= 16 {
+        if n_in_jacks > 16 || n_out_jacks > 16 {
             return Err(InvalidArguments);
         }
         Ok(MidiClass {
