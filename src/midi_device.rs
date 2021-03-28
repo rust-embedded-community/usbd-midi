@@ -47,7 +47,10 @@ impl<B: UsbBus> MidiClass<'_, B> {
         })
     }
 
-    pub fn send_message(&mut self, usb_midi:UsbMidiEventPacket) -> Result<usize> {
+    pub fn send_bytes(&mut self, buffer: [u8; 4]) -> Result<usize> {
+        self.standard_bulkin.write(&buffer)
+    }
+    pub fn send_message(&mut self, usb_midi: UsbMidiEventPacket) -> Result<usize> {
         let bytes : [u8;MIDI_PACKET_SIZE] = usb_midi.into();
         self.standard_bulkin.write(&bytes)
     }
