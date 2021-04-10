@@ -59,13 +59,26 @@ impl<B: UsbBus> MidiClass<'_, B> {
         self.standard_bulkout.read(buffer)
     }
 
-    /// calculates the index'th midi in jack id
-    fn in_jack_id(&self, index: u8) -> u8 {
-        return index + 1;
+    /// calculates the index'th external midi in jack id
+    fn in_jack_id_ext(&self, index: u8) -> u8 {
+        debug_assert!(index < self.n_in_jacks);
+        return 2 * index + 1;
     }
-    /// calculates the index'th midi in jack id
-    fn out_jack_id(&self, index: u8) -> u8 {
-        return self.n_in_jacks + index + 1;
+    /// calculates the index'th embedded midi out jack id
+    fn out_jack_id_emb(&self, index: u8) -> u8 {
+        debug_assert!(index < self.n_in_jacks);
+        return 2 * index + 2;
+    }
+
+    /// calculates the index'th external midi out jack id
+    fn out_jack_id_ext(&self, index: u8) -> u8 {
+        debug_assert!(index < self.n_out_jacks);
+        return 2 * self.n_in_jacks + 2 * index + 1;
+    }
+    /// calculates the index'th embedded midi in jack id
+    fn in_jack_id_emb(&self, index: u8) -> u8 {
+        debug_assert!(index < self.n_out_jacks);
+        return 2 * self.n_in_jacks + 2 * index + 2;
     }
 }
 
@@ -103,8 +116,8 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
 
         let midi_streaming_start_byte = writer.position();
         let midi_streaming_total_length =
-            7 + self.n_in_jacks as usize * MIDI_IN_SIZE as usize + self.n_out_jacks as usize * MIDI_OUT_SIZE as usize
-            + 9 + (4+self.n_in_jacks as usize) + 9 + (4+self.n_out_jacks as usize);
+            7 + (self.n_in_jacks + self.n_out_jacks) as usize * (MIDI_IN_SIZE + MIDI_OUT_SIZE) as usize
+            + 9 + (4+self.n_out_jacks as usize) + 9 + (4+self.n_in_jacks as usize);
 
         //Streaming extra info
         writer.write( // len = 7
@@ -122,8 +135,20 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 CS_INTERFACE,
                 &[
                     MIDI_IN_JACK_SUBTYPE,
+                    EXTERNAL,
+                    self.in_jack_id_ext(i), // id
+                    0x00
+                ]
+            )?;
+        }
+
+        for i in 0..self.n_out_jacks {
+            writer.write( // len = 6 = MIDI_IN_SIZE
+                CS_INTERFACE,
+                &[
+                    MIDI_IN_JACK_SUBTYPE,
                     EMBEDDED,
-                    self.in_jack_id(i), // id
+                    self.in_jack_id_emb(i), // id
                     0x00
                 ]
             )?;
@@ -134,10 +159,26 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 CS_INTERFACE,
                 &[
                     MIDI_OUT_JACK_SUBTYPE,
+                    EXTERNAL,
+                    self.out_jack_id_ext(i), //id
+                    0x01, // 1 pin
+                    self.in_jack_id_emb(i), // pin is connected to this entity...
+                    0x01, // ...to the first pin
+                    0x00
+                ]
+            )?;
+        }
+
+        for i in 0..self.n_in_jacks {
+            writer.write ( // len = 9 = MIDI_OUT_SIZE
+                CS_INTERFACE,
+                &[
+                    MIDI_OUT_JACK_SUBTYPE,
                     EMBEDDED,
-                    self.out_jack_id(i), //id
-                    0x00, // no pins
-                    0x00, 0x00, // windows wants these two bytes, no idea why. they don't belong here.
+                    self.out_jack_id_emb(i), //id
+                    0x01, // 1 pin
+                    self.in_jack_id_ext(i), // pin is connected to this entity...
+                    0x01, // ...to the first pin
                     0x00
                 ]
             )?;
@@ -151,23 +192,23 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
 
         writer.endpoint(&self.standard_bulkout)?; // len = 9
 
-        endpoint_data[1] = self.n_in_jacks;
-        for i in 0..self.n_in_jacks {
-            endpoint_data[2 + i as usize] = self.in_jack_id(i);
-        }
-        writer.write( // len = 4 + self.n_in_jacks
-            CS_ENDPOINT,
-            &endpoint_data[0..2+self.n_in_jacks as usize]
-        )?;
-
-        writer.endpoint(&self.standard_bulkin)?; // len = 9
         endpoint_data[1] = self.n_out_jacks;
         for i in 0..self.n_out_jacks {
-            endpoint_data[2 + i as usize] = self.out_jack_id(i);
+            endpoint_data[2 + i as usize] = self.in_jack_id_emb(i);
         }
         writer.write( // len = 4 + self.n_out_jacks
             CS_ENDPOINT,
             &endpoint_data[0..2+self.n_out_jacks as usize]
+        )?;
+
+        writer.endpoint(&self.standard_bulkin)?; // len = 9
+        endpoint_data[1] = self.n_in_jacks;
+        for i in 0..self.n_in_jacks {
+            endpoint_data[2 + i as usize] = self.out_jack_id_emb(i);
+        }
+        writer.write( // len = 4 + self.n_in_jacks
+            CS_ENDPOINT,
+            &endpoint_data[0..2+self.n_in_jacks as usize]
         )?;
 
         let midi_streaming_end_byte = writer.position();
