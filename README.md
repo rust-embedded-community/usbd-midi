@@ -35,7 +35,7 @@ fn main() -> ! {
 
     let usb_bus = UsbBus::new(usb);
 
-    let mut midi = MidiClass::new(&usb_bus);
+    let mut midi = MidiClass::new(&usb_bus, 1, 1);
 
     let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
         .product("MIDI Test")
@@ -69,3 +69,19 @@ fn main() -> ! {
     }
 }
 ```
+
+## Using more than one MIDI port
+
+Calling `MidiClass::new(&usb_bus, N, M);` with `N, M >= 1` to provide more
+than one input or output port requires the `control-buffer-256` feature of
+the usb-device crate:
+
+Cargo.toml:
+```
+usb-device = { version = ">=0.2.1", features = ["control-buffer-256"] }
+```
+
+Up to 5 in/out pairs can be used this way until we again run out of buffer
+space. Note that exceeding the available buffer space will silently fail
+to send the descriptors correctly, no obvious `panic!` will hint the
+actual problem.
