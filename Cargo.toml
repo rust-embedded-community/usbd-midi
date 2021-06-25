@@ -1,7 +1,7 @@
 [package]
 name = "usbd-midi"
 version = "0.2.0"
-authors = ["beau trepp <beautrepp@gmail.com>"]
+authors = ["beau trepp <beautrepp@gmail.com>", "Florian Jung <flo@windfis.ch>"]
 edition = "2018"
 description = "A usb-midi implementation for usb-device"
 homepage = "https://github.com/btrepp/usbd-midi"
