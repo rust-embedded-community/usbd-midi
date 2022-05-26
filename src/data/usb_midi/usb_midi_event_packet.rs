@@ -1,101 +1,72 @@
-use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
-use crate::data::midi::message::Message;
-use crate::data::byte::u4::U4;
-use crate::data::midi::message::raw::{Payload,Raw};
-use core::convert::TryFrom;
+use core::{convert::TryFrom, ops::Shl};
 
+use midi_types::MidiMessage;
 
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
-#[derive(Debug,Eq, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct UsbMidiEventPacket {
-    pub cable_number : CableNumber,
-    pub message: Message
+    pub cable_number: u8,
+    pub message: MidiMessage,
 }
 
-impl From<UsbMidiEventPacket> for [u8;4] {
-    fn from(value:UsbMidiEventPacket) -> [u8;4] {
-        let message= value.message;
-        let cable_number = U4::from(value.cable_number);
-        let index_number = {
-                let code_index = 
-                        CodeIndexNumber::find_from_message(&message);
-                U4::from(code_index)
-        };
-        let header = U4::combine(cable_number,index_number);
+impl From<UsbMidiEventPacket> for [u8; 4] {
+    fn from(value: UsbMidiEventPacket) -> [u8; 4] {
+        let message = value.message;
+        let cable_number = value.cable_number;
+        let index_number = CodeIndexNumber::find_from_message(&message).0;
+        let header: u8 = cable_number.shl(4) | index_number;
 
-        let raw_midi = Raw::from(message);
-        let status = raw_midi.status;
-
-        match raw_midi.payload {
-            Payload::Empty => [header,status,0,0],
-            Payload::SingleByte(byte) => 
-                                [header,status,byte.into(),0],
-            Payload::DoubleByte(byte1,byte2) => 
-                                    [header,status,byte1.into(),byte2.into()]           
-        }
+        //TODO Sysex
+        let mut data: [u8; 4] = [header, 0, 0, 0];
+        assert!(message.render(&mut data[1..]).is_ok());
+        data
     }
 }
 
 #[derive(Debug)]
 pub enum MidiPacketParsingError {
-    InvalidNote(u8),
     InvalidCableNumber(u8),
-    InvalidEventType(u8),
-    MissingDataPacket
+    InvalidData,
+    MissingDataPacket,
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
     type Error = MidiPacketParsingError;
 
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let raw_cable_number= match value.get(0) {
+    fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+        let cable_number = match buf.get(0) {
             Some(byte) => *byte >> 4,
-            None => return Err(MidiPacketParsingError::MissingDataPacket)
+            None => return Err(MidiPacketParsingError::MissingDataPacket),
         };
 
-        let cable_number = match CableNumber::try_from(u8::from(raw_cable_number)) {
-            Ok(val) => val,
-            _ => return Err(MidiPacketParsingError::InvalidCableNumber(raw_cable_number))
-        };
-
-        let message_body = match value.get(1..) {
-            Some(bytes) => bytes,
-            None => return Err(MidiPacketParsingError::MissingDataPacket)
-        };
-
-        let message = Message::try_from(message_body)?;
+        let message =
+            MidiMessage::try_from(&buf[1..]).map_err(|_| MidiPacketParsingError::InvalidData)?;
 
         Ok(UsbMidiEventPacket {
             cable_number,
-            message
+            message,
         })
     }
 }
 
-impl UsbMidiEventPacket{
-
-    pub fn from_midi(cable:CableNumber, midi:Message)
-        -> UsbMidiEventPacket{
-        UsbMidiEventPacket{
-            cable_number : cable,
-            message : midi
+impl UsbMidiEventPacket {
+    pub fn from_midi(cable: u8, midi: MidiMessage) -> UsbMidiEventPacket {
+        assert!(cable < 16);
+        UsbMidiEventPacket {
+            cable_number: cable,
+            message: midi,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use core::convert::TryFrom;
     use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
-    use crate::data::midi::channel::Channel::{Channel1, Channel2};
-    use crate::data::midi::notes::Note;
-    use crate::data::byte::u7::U7;
-    use crate::data::midi::message::Message;
-    use crate::data::usb_midi::cable_number::CableNumber::{Cable0,Cable1};
-    use crate::data::midi::message::control_function::ControlFunction;
+    use core::convert::TryFrom;
+    use midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7};
 
     macro_rules! decode_message_test {
         ($($id:ident:$value:expr,)*) => {
@@ -112,32 +83,32 @@ mod tests {
 
     decode_message_test! {
         note_on: ([9, 144, 36, 127], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::NoteOn(Channel1, Note::C2, U7(127))
+            cable_number: 0,
+            message: MidiMessage::NoteOn(Channel::from(0), Note::from(36), Value7::from(127))
         }),
         note_off: ([8, 128, 36, 0], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::NoteOff(Channel1, Note::C2, U7(0))
+            cable_number: 0,
+            message: MidiMessage::NoteOff(Channel::from(0), Note::from(36), Value7::from(0))
         }),
         polyphonic_aftertouch: ([10, 160, 36, 64], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64))
+            cable_number: 0,
+            message: MidiMessage::KeyPressure(Channel::from(0), Note::from(36), Value7::from(64))
         }),
         program_change: ([28, 192, 127, 0], UsbMidiEventPacket {
-            cable_number: Cable1,
-            message: Message::ProgramChange(Channel1, U7(127))
+            cable_number: 1,
+            message: MidiMessage::ProgramChange(Channel::from(0), Program::from(127))
         }),
         channel_aftertouch: ([13, 208, 127, 0], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::ChannelAftertouch(Channel1, U7(127))
+            cable_number: 0,
+            message: MidiMessage::ChannelPressure(Channel::from(0), Value7::from(127))
         }),
         pitch_wheel: ([14, 224, 64, 32], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::PitchWheelChange(Channel1, U7(64), U7(32))
+            cable_number: 0,
+            message: MidiMessage::PitchBendChange(Channel::from(0), Value14::from((64, 32)))
         }),
         control_change: ([11, 177, 1, 32], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32))
+            cable_number: 0,
+            message: MidiMessage::ControlChange(Channel::from(1), Control::from(1), Value7::from(32))
         }),
     }
 }
