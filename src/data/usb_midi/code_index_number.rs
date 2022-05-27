@@ -1,89 +1,67 @@
-use crate::data::byte::u4::U4;
-use core::convert::TryFrom;
+//! The Code Index Number(CIN) indicates the classification
+//! of the bytes in the MIDI_x fields.
+//!
+//! # Note
+//! These numbers are all pre-shifted and ready to be ORed with the cable number nibble.
 use midi_types::MidiMessage;
 
-/// The Code Index Number(CIN) indicates the classification
-/// of the bytes in the MIDI_x fields
-pub struct CodeIndexNumber(pub u8);
-pub struct InvalidCodeIndexNumber(pub u8);
+/// Miscellaneous function codes. Reserved for future extensions
+pub const MISC_FUNCTION: u8 = 0x00;
+/// Cable events. Reserved for future expansion.
+pub const CABLE_EVENTS: u8 = 0x10;
+/// Two-byte System Common messages like MTC, SongSelect, etc.
+pub const SYSTEM_COMMON_LEN2: u8 = 0x20;
+/// Three-byte System Common messages like SPP, etc.
+pub const SYSTEM_COMMON_LEN3: u8 = 0x30;
+/// SysEx starts or continues
+pub const SYSEX_STARTS: u8 = 0x40;
+pub const SYSEX_CONTINUES: u8 = SYSEX_STARTS;
+/// Single-byte System Common Message or SysEx ends with following single byte.
+pub const SYSTEM_COMMON_LEN1: u8 = 0x50;
+/// SysEx ends with the following byte
+pub const SYSEX_ENDS_NEXT1: u8 = SYSTEM_COMMON_LEN1;
+/// SysEx ends with following two bytes
+pub const SYSEX_ENDS_NEXT2: u8 = 0x60;
+/// SysEx ends with following three bytes
+pub const SYSEX_ENDS_NEXT3: u8 = 0x70;
+/// Note - Off
+pub const NOTE_OFF: u8 = 0x80;
+/// Note - On
+pub const NOTE_ON: u8 = 0x90;
+/// Poly-KeyPress
+pub const POLY_KEYPRESS: u8 = 0xA0;
+/// Control Change
+pub const CONTROL_CHANGE: u8 = 0xB0;
+/// Program Change
+pub const PROGRAM_CHANGE: u8 = 0xC0;
+/// Channel Pressure
+pub const CHANNEL_PRESSURE: u8 = 0xD0;
+/// Pitch Bend Change
+pub const PITCHBEND_CHANGE: u8 = 0xE0;
+/// Single Byte
+pub const SINGLE_BYTE: u8 = 0xF0;
 
-impl TryFrom<u8> for CodeIndexNumber {
-    type Error = InvalidCodeIndexNumber;
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        if value > 0xF {
-            Err(InvalidCodeIndexNumber(value))
-        } else {
-            Ok(CodeIndexNumber(value))
-        }
-    }
-}
+/// Find the appropriate Code Index Number from a `MidiMessage`
+pub fn find_from_message(value: &MidiMessage) -> u8 {
+    match value {
+        MidiMessage::NoteOn(_, _, _) => NOTE_ON,
+        MidiMessage::NoteOff(_, _, _) => NOTE_OFF,
+        MidiMessage::ChannelPressure(_, _) => CHANNEL_PRESSURE,
+        MidiMessage::PitchBendChange(_, _) => PITCHBEND_CHANGE,
+        MidiMessage::KeyPressure(_, _, _) => POLY_KEYPRESS,
+        MidiMessage::ProgramChange(_, _) => PROGRAM_CHANGE,
+        MidiMessage::ControlChange(_, _, _) => CONTROL_CHANGE,
 
-impl From<CodeIndexNumber> for U4 {
-    fn from(value: CodeIndexNumber) -> U4 {
-        U4::from_overflowing_u8(value.0)
-    }
-}
+        MidiMessage::QuarterFrame(_) | MidiMessage::SongSelect(_) => SYSTEM_COMMON_LEN2,
 
-impl CodeIndexNumber {
-    /// Miscellaneous function codes. Reserved for future extensions
-    pub const MISC_FUNCTION: CodeIndexNumber = CodeIndexNumber(0x00);
-    /// Cable events. Reserved for future expansion.
-    pub const CABLE_EVENTS: CodeIndexNumber = CodeIndexNumber(0x1);
-    /// Two-byte System Common messages like MTC, SongSelect, etc.
-    pub const SYSTEM_COMMON_LEN2: CodeIndexNumber = CodeIndexNumber(0x2);
-    /// Three-byte System Common messages like SPP, etc.
-    pub const SYSTEM_COMMON_LEN3: CodeIndexNumber = CodeIndexNumber(0x3);
-    /// SysEx starts or continues
-    pub const SYSEX_STARTS: CodeIndexNumber = CodeIndexNumber(0x4);
-    pub const SYSEX_CONTINUES: CodeIndexNumber = CodeIndexNumber::SYSEX_STARTS;
-    /// Single-byte System Common Message or SysEx ends with following single byte.
-    pub const SYSTEM_COMMON_LEN1: CodeIndexNumber = CodeIndexNumber(0x5);
-    /// SysEx ends with the following byte
-    pub const SYSEX_ENDS_NEXT1: CodeIndexNumber = CodeIndexNumber::SYSTEM_COMMON_LEN1;
-    /// SysEx ends with following two bytes
-    pub const SYSEX_ENDS_NEXT2: CodeIndexNumber = CodeIndexNumber(0x6);
-    /// SysEx ends with following three bytes
-    pub const SYSEX_ENDS_NEXT3: CodeIndexNumber = CodeIndexNumber(0x7);
-    /// Note - Off
-    pub const NOTE_OFF: CodeIndexNumber = CodeIndexNumber(0x8);
-    /// Note - On
-    pub const NOTE_ON: CodeIndexNumber = CodeIndexNumber(0x9);
-    /// Poly-KeyPress
-    pub const POLY_KEYPRESS: CodeIndexNumber = CodeIndexNumber(0xA);
-    /// Control Change
-    pub const CONTROL_CHANGE: CodeIndexNumber = CodeIndexNumber(0xB);
-    /// Program Change
-    pub const PROGRAM_CHANGE: CodeIndexNumber = CodeIndexNumber(0xC);
-    /// Channel Pressure
-    pub const CHANNEL_PRESSURE: CodeIndexNumber = CodeIndexNumber(0xD);
-    /// Pitch Bend Change
-    pub const PITCHBEND_CHANGE: CodeIndexNumber = CodeIndexNumber(0xE);
-    /// Single Byte
-    pub const SINGLE_BYTE: CodeIndexNumber = CodeIndexNumber(0xF);
+        MidiMessage::SongPositionPointer(_) => SYSTEM_COMMON_LEN3,
 
-    pub fn find_from_message(value: &MidiMessage) -> CodeIndexNumber {
-        match value {
-            MidiMessage::NoteOn(_, _, _) => CodeIndexNumber::NOTE_ON,
-            MidiMessage::NoteOff(_, _, _) => CodeIndexNumber::NOTE_OFF,
-            MidiMessage::ChannelPressure(_, _) => CodeIndexNumber::CHANNEL_PRESSURE,
-            MidiMessage::PitchBendChange(_, _) => CodeIndexNumber::PITCHBEND_CHANGE,
-            MidiMessage::KeyPressure(_, _, _) => CodeIndexNumber::POLY_KEYPRESS,
-            MidiMessage::ProgramChange(_, _) => CodeIndexNumber::PROGRAM_CHANGE,
-            MidiMessage::ControlChange(_, _, _) => CodeIndexNumber::CONTROL_CHANGE,
-
-            MidiMessage::QuarterFrame(_) | MidiMessage::SongSelect(_) => {
-                CodeIndexNumber::SYSTEM_COMMON_LEN2
-            }
-
-            MidiMessage::SongPositionPointer(_) => CodeIndexNumber::SYSTEM_COMMON_LEN3,
-
-            MidiMessage::TuneRequest
-            | MidiMessage::TimingClock
-            | MidiMessage::Start
-            | MidiMessage::Continue
-            | MidiMessage::Stop
-            | MidiMessage::ActiveSensing
-            | MidiMessage::Reset => CodeIndexNumber::SYSTEM_COMMON_LEN1,
-        }
+        MidiMessage::TuneRequest
+        | MidiMessage::TimingClock
+        | MidiMessage::Start
+        | MidiMessage::Continue
+        | MidiMessage::Stop
+        | MidiMessage::ActiveSensing
+        | MidiMessage::Reset => SYSTEM_COMMON_LEN1,
     }
 }

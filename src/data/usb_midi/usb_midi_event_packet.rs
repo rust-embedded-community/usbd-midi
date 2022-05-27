@@ -1,5 +1,5 @@
-use crate::data::usb_midi::code_index_number::CodeIndexNumber;
-use core::{convert::TryFrom, ops::Shl};
+use crate::data::usb_midi::code_index_number;
+use core::convert::TryFrom;
 
 use midi_types::MidiMessage;
 
@@ -16,8 +16,8 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
         let message = value.message;
         let cable_number = value.cable_number;
-        let index_number = CodeIndexNumber::find_from_message(&message).0;
-        let header: u8 = cable_number.shl(4) | index_number;
+        let index_number = code_index_number::find_from_message(&message);
+        let header: u8 = cable_number | index_number;
 
         //TODO Sysex
         let mut data: [u8; 4] = [header, 0, 0, 0];
