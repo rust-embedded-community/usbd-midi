@@ -8,8 +8,8 @@ use midi_types::MidiMessage;
 /// message over the supplied cable number
 #[derive(Debug, PartialEq)]
 pub struct UsbMidiEventPacket {
-    pub cable_number: u8,
-    pub message: MidiMessage,
+    cable_number: u8,
+    message: MidiMessage,
 }
 
 impl From<UsbMidiEventPacket> for [u8; 4] {
@@ -53,12 +53,20 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 }
 
 impl UsbMidiEventPacket {
-    pub fn from_midi(cable: u8, midi: MidiMessage) -> UsbMidiEventPacket {
+    pub fn new(cable: u8, midi: MidiMessage) -> UsbMidiEventPacket {
         assert!(cable < 16);
         UsbMidiEventPacket {
             cable_number: cable,
             message: midi,
         }
+    }
+
+    pub fn message(&self) -> &MidiMessage {
+        &self.message
+    }
+
+    pub fn cable_number(&self) -> u8 {
+        self.cable_number
     }
 }
 
