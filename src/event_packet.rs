@@ -26,7 +26,7 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum MidiPacketParsingError {
     InvalidData,
     MissingDataPacket,
