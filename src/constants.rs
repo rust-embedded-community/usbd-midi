@@ -1,3 +1,4 @@
+//! Shared constants
 //This should be better organized in future
 
 pub const USB_CLASS_NONE: u8 = 0x00;

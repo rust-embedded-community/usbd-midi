@@ -1,5 +1,7 @@
-use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
-use crate::midi_device::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
+use crate::{
+    event_packet::{MidiPacketParsingError, UsbMidiEventPacket},
+    midi_device::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE},
+};
 use core::convert::TryFrom;
 
 pub struct MidiPacketBufferReader<'a> {

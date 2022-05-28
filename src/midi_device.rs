@@ -1,5 +1,7 @@
-use crate::data::usb::constants::*;
-use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::{
+    constants::*,
+    event_packet::{MidiPacketParsingError, UsbMidiEventPacket},
+};
 use usb_device::class_prelude::*;
 use usb_device::Result;
 

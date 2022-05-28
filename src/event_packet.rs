@@ -1,4 +1,4 @@
-use crate::data::usb_midi::code_index_number;
+use crate::code_index_number;
 use core::convert::TryFrom;
 
 use midi_types::MidiMessage;
@@ -72,7 +72,7 @@ impl UsbMidiEventPacket {
 
 #[cfg(test)]
 mod tests {
-    use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
+    use crate::event_packet::UsbMidiEventPacket;
     use core::convert::TryFrom;
     use midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7};
 
