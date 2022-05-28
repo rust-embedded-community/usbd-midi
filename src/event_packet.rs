@@ -28,7 +28,6 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
 
 #[derive(Debug)]
 pub enum MidiPacketParsingError {
-    InvalidCableNumber(u8),
     InvalidData,
     MissingDataPacket,
 }
