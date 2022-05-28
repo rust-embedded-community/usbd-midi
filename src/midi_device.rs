@@ -2,8 +2,7 @@ use crate::{
     constants::*,
     event_packet::{MidiPacketParsingError, UsbMidiEventPacket},
 };
-use usb_device::class_prelude::*;
-use usb_device::Result;
+use usb_device::{class_prelude::*, Result};
 
 const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
