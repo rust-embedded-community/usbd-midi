@@ -7,9 +7,6 @@ use usb_device::{class_prelude::*, Result};
 const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
 
-pub const MIDI_PACKET_SIZE: usize = 4;
-pub const MAX_PACKET_SIZE: usize = 64;
-
 ///Note we are using MidiIn here to refer to the fact that
 ///The Host sees it as a midi in device
 ///This class allows you to send data in
@@ -22,13 +19,16 @@ pub struct MidiClass<'a, B: UsbBus> {
     n_out_jacks: u8,
 }
 
+#[derive(Debug)]
 pub enum MidiReadError {
     ParsingFailed(MidiPacketParsingError),
     UsbError(UsbError),
 }
 
-#[derive(Debug)]
-pub struct InvalidArguments;
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum MidiClassCreateError {
+    InvalidArguments,
+}
 
 impl<B: UsbBus> MidiClass<'_, B> {
     /// Creates a new MidiClass with the provided UsbBus and `n_in/out_jacks` embedded input/output jacks (or "cables",
@@ -38,9 +38,9 @@ impl<B: UsbBus> MidiClass<'_, B> {
         alloc: &UsbBusAllocator<B>,
         n_in_jacks: u8,
         n_out_jacks: u8,
-    ) -> core::result::Result<MidiClass<'_, B>, InvalidArguments> {
+    ) -> core::result::Result<MidiClass<'_, B>, MidiClassCreateError> {
         if n_in_jacks > 16 || n_out_jacks > 16 {
-            return Err(InvalidArguments);
+            return Err(MidiClassCreateError::InvalidArguments);
         }
         Ok(MidiClass {
             standard_ac: alloc.interface(),

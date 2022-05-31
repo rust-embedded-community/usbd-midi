@@ -2,6 +2,8 @@
 
 pub mod code_index_number;
 pub mod constants;
-pub mod event_packet;
-pub mod midi_device;
-pub mod packet_reader;
+mod event_packet;
+mod midi_device;
+mod packet_reader;
+
+pub use {event_packet::*, midi_device::*, packet_reader::*};
