@@ -34,7 +34,7 @@ impl<'a> ExactSizeIterator for MidiPacketBufferReader<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7};
+    use crate::midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7};
     const VALID_BUF: [u8; 64] = [
         9, 144, 36, 127, //note on
         8, 128, 36, 0, //note off

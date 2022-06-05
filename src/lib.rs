@@ -6,4 +6,4 @@ mod event_packet;
 mod midi_device;
 mod packet_reader;
 
-pub use {event_packet::*, midi_device::*, packet_reader::*};
+pub use {::midi_parse_render::midi_types, event_packet::*, midi_device::*, packet_reader::*};

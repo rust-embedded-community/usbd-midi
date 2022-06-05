@@ -3,7 +3,7 @@
 //!
 //! # Note
 //! These numbers are all pre-shifted and ready to be ORed with the cable number nibble.
-use midi_types::MidiMessage;
+use midi_parse_render::midi_types::MidiMessage;
 
 /// Miscellaneous function codes. Reserved for future extensions
 pub const MISC_FUNCTION: u8 = 0x00;
