@@ -1,7 +1,8 @@
-use crate::code_index_number;
-use core::convert::TryFrom;
-
-use midi_types::MidiMessage;
+use {
+    crate::{code_index_number, midi_types::MidiMessage},
+    core::convert::TryFrom,
+    midi_convert::{MidiRenderSlice, MidiTryParseSlice},
+};
 
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
@@ -21,7 +22,7 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
 
         //TODO Sysex
         let mut data: [u8; 4] = [header, 0, 0, 0];
-        assert!(message.render(&mut data[1..]).is_ok());
+        let _ = message.render_slice(&mut data[1..]);
         data
     }
 }
@@ -41,8 +42,8 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
             None => return Err(MidiPacketParsingError::MissingDataPacket),
         };
 
-        let message =
-            MidiMessage::try_from(&buf[1..]).map_err(|_| MidiPacketParsingError::InvalidData)?;
+        let message = MidiMessage::try_parse_slice(&buf[1..])
+            .map_err(|_| MidiPacketParsingError::InvalidData)?;
 
         Ok(UsbMidiEventPacket {
             cable_number,
@@ -71,9 +72,13 @@ impl UsbMidiEventPacket {
 
 #[cfg(test)]
 mod tests {
-    use crate::event_packet::UsbMidiEventPacket;
-    use core::convert::TryFrom;
-    use midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7};
+    use {
+        crate::{
+            event_packet::UsbMidiEventPacket,
+            midi_types::{Channel, Control, MidiMessage, Note, Program, Value14, Value7},
+        },
+        core::convert::TryFrom,
+    };
 
     macro_rules! decode_message_test {
         ($($id:ident:$value:expr,)*) => {

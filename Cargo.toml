@@ -12,7 +12,7 @@ license = "MIT"
 embedded-hal = "0.2.2"
 nb = "1.0.0"
 usb-device = "0.2.3"
-midi-types = { git = "https://github.com/x37v/midi-types", branch = "xnor/render-parse" }
+midi-convert = { git = "https://github.com/rust-midi/midi-convert", branch = "main" }
 
 [dependencies.num_enum]
 version = "0.5.1"
