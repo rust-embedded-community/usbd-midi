@@ -14,3 +14,6 @@ pub const CS_ENDPOINT: u8 = 0x25;
 pub const HEADER_SUBTYPE: u8 = 0x01;
 pub const MS_HEADER_SUBTYPE: u8 = 0x01;
 pub const MS_GENERAL: u8 = 0x01;
+
+pub const MIDI_PACKET_SIZE: usize = 4;
+pub const MAX_PACKET_SIZE: usize = 64;
