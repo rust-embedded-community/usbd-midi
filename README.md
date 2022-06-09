@@ -12,7 +12,7 @@ usb-device traits.
 ## Example
 
 ### Receive MIDI
-Turn on the integrated LED of a STM32 BluePill board as long as C2 is pressed
+Turn on the integrated LED of a STM32 BluePill board as long a note is held
 ```rust
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
@@ -39,8 +39,7 @@ fn main() -> ! {
 
     let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
         .product("MIDI Test")
-        .device_class(USB_AUDIO_CLASS)
-        .device_sub_class(USB_MIDISTREAMING_SUBCLASS)
+        .device_class(USB_CLASS_NONE)
         .build();
 
     loop {
@@ -55,10 +54,10 @@ fn main() -> ! {
             for packet in buffer_reader.into_iter() {
                 if let Ok(packet) = packet {
                     match packet.message {
-                        Message::NoteOn(Channel1, Note::C2, ..) => {
+                        MidiMessage::NoteOn(..) => {
                             led.set_low().unwrap();
                         },
-                        Message::NoteOff(Channel1, Note::C2, ..) => {
+                        MidiMessage::NoteOff(..) => {
                             led.set_high().unwrap();
                         },
                         _ => {}
