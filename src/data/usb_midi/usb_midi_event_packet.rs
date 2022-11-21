@@ -1,18 +1,21 @@
 use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
-use crate::data::midi::message::Message;
 use crate::data::byte::u4::U4;
-use crate::data::midi::message::raw::{Payload,Raw};
 use core::convert::TryFrom;
+use midi_convert::{
+    MidiRenderSlice,
+    MidiTryParseSlice,
+    midi_types::MidiMessage,
+};
 
 
 /// A packet that communicates with the host
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
-#[derive(Debug,Eq, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct UsbMidiEventPacket {
     pub cable_number : CableNumber,
-    pub message: Message
+    pub message: MidiMessage
 }
 
 impl From<UsbMidiEventPacket> for [u8;4] {
@@ -25,17 +28,10 @@ impl From<UsbMidiEventPacket> for [u8;4] {
                 U4::from(code_index)
         };
         let header = U4::combine(cable_number,index_number);
+        let mut data: [u8; 4] = [header, 0, 0, 0];
+        message.render_slice(&mut data[1..]);
 
-        let raw_midi = Raw::from(message);
-        let status = raw_midi.status;
-
-        match raw_midi.payload {
-            Payload::Empty => [header,status,0,0],
-            Payload::SingleByte(byte) => 
-                                [header,status,byte.into(),0],
-            Payload::DoubleByte(byte1,byte2) => 
-                                    [header,status,byte1.into(),byte2.into()]           
-        }
+        data
     }
 }
 
@@ -66,7 +62,7 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
             None => return Err(MidiPacketParsingError::MissingDataPacket)
         };
 
-        let message = Message::try_from(message_body)?;
+        let message = MidiMessage::try_parse_slice(message_body).map_err(|_| MidiPacketParsingError::MissingDataPacket)?;
 
         Ok(UsbMidiEventPacket {
             cable_number,
@@ -77,7 +73,7 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 
 impl UsbMidiEventPacket{
 
-    pub fn from_midi(cable:CableNumber, midi:Message)
+    pub fn from_midi(cable:CableNumber, midi:MidiMessage)
         -> UsbMidiEventPacket{
         UsbMidiEventPacket{
             cable_number : cable,
