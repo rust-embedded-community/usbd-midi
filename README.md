@@ -43,6 +43,8 @@ fn main() -> ! {
         .device_sub_class(USB_MIDISTREAMING_SUBCLASS)
         .build();
 
+    const CHANNEL1: Channel = Channel::new(0);
+
     loop {
         if !usb_dev.poll(&mut [&mut midi]) {
             continue;
@@ -55,10 +57,10 @@ fn main() -> ! {
             for packet in buffer_reader.into_iter() {
                 if let Ok(packet) = packet {
                     match packet.message {
-                        Message::NoteOn(Channel1, Note::C2, ..) => {
+                        MidiMessage::NoteOn(CHANNEL1, Note::C2, ..) => {
                             led.set_low().unwrap();
                         },
-                        Message::NoteOff(Channel1, Note::C2, ..) => {
+                        MidiMessage::NoteOff(CHANNEL1, Note::C2, ..) => {
                             led.set_high().unwrap();
                         },
                         _ => {}
