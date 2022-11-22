@@ -13,6 +13,7 @@ embedded-hal = "0.2.2"
 nb = "1.0.0"
 usb-device = "0.2.3"
 midi-convert = "0.1.1"
+midi-types = "0.1.4"
 
 [dependencies.num_enum]
 version = "0.5.1"
