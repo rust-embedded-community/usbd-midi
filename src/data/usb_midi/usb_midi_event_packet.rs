@@ -86,12 +86,8 @@ impl UsbMidiEventPacket{
 mod tests {
     use core::convert::TryFrom;
     use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
-    use crate::data::midi::channel::Channel::{Channel1, Channel2};
-    use crate::data::midi::notes::Note;
-    use crate::data::byte::u7::U7;
-    use crate::data::midi::message::Message;
+    use crate::midi_types::{Channel, MidiMessage, Value7, Value14, Note, Program, Control};
     use crate::data::usb_midi::cable_number::CableNumber::{Cable0,Cable1};
-    use crate::data::midi::message::control_function::ControlFunction;
 
     macro_rules! decode_message_test {
         ($($id:ident:$value:expr,)*) => {
@@ -106,34 +102,37 @@ mod tests {
         }
     }
 
+    const CHANNEL1: Channel = Channel::new(0);
+    const CHANNEL2: Channel = Channel::new(1);
+
     decode_message_test! {
         note_on: ([9, 144, 36, 127], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::NoteOn(Channel1, Note::C2, U7(127))
+            message: MidiMessage::NoteOn(CHANNEL1, Note::C1, Value7::new(127))
         }),
         note_off: ([8, 128, 36, 0], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::NoteOff(Channel1, Note::C2, U7(0))
+            message: MidiMessage::NoteOff(CHANNEL1, Note::C1, Value7::new(0))
         }),
         polyphonic_aftertouch: ([10, 160, 36, 64], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64))
+            message: MidiMessage::KeyPressure(CHANNEL1, Note::C1, Value7::new(64))
         }),
         program_change: ([28, 192, 127, 0], UsbMidiEventPacket {
             cable_number: Cable1,
-            message: Message::ProgramChange(Channel1, U7(127))
+            message: MidiMessage::ProgramChange(CHANNEL1, Program::new(127))
         }),
         channel_aftertouch: ([13, 208, 127, 0], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::ChannelAftertouch(Channel1, U7(127))
+            message: MidiMessage::ChannelPressure(CHANNEL1, Value7::new(127))
         }),
         pitch_wheel: ([14, 224, 64, 32], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::PitchWheelChange(Channel1, U7(64), U7(32))
+            message: MidiMessage::PitchBendChange(CHANNEL1, Value14::from((64u8, 32u8)))
         }),
         control_change: ([11, 177, 1, 32], UsbMidiEventPacket {
             cable_number: Cable0,
-            message: Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32))
+            message: MidiMessage::ControlChange(CHANNEL2, Control::new(1), Value7::new(32))
         }),
     }
 }
