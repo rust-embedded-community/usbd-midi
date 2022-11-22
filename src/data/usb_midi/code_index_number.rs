@@ -64,17 +64,27 @@ impl CodeIndexNumber {
     /// Single Byte
     pub const SINGLE_BYTE : CodeIndexNumber= CodeIndexNumber(0xF);
  
-    pub fn find_from_message(value:&MidiMessage) -> CodeIndexNumber{
+    pub fn find_from_message(value: &MidiMessage) -> CodeIndexNumber {
         match value {
-            MidiMessage::NoteOn(_,_,_) => CodeIndexNumber::NOTE_ON,
-            MidiMessage::NoteOff(_,_,_) => CodeIndexNumber::NOTE_OFF,
+            MidiMessage::NoteOn(..) => CodeIndexNumber::NOTE_ON,
+            MidiMessage::NoteOff(..) => CodeIndexNumber::NOTE_OFF,
             MidiMessage::ChannelPressure(..) => CodeIndexNumber::CHANNEL_PRESSURE,
             MidiMessage::PitchBendChange(..) => CodeIndexNumber::PITCHBEND_CHANGE,
             MidiMessage::KeyPressure(..) => CodeIndexNumber::POLY_KEYPRESS,
-            MidiMessage::ProgramChange(_,_) => CodeIndexNumber::PROGRAM_CHANGE,
-            MidiMessage::ControlChange(_,_,_) => CodeIndexNumber::CONTROL_CHANGE,
-            _ => CodeIndexNumber::SINGLE_BYTE
-
+            MidiMessage::ProgramChange(..) => CodeIndexNumber::PROGRAM_CHANGE,
+            MidiMessage::ControlChange(..) => CodeIndexNumber::CONTROL_CHANGE,
+            MidiMessage::Stop
+            | MidiMessage::Start
+            | MidiMessage::Continue
+            | MidiMessage::TimingClock
+            | MidiMessage::Reset
+            | MidiMessage::ActiveSensing => CodeIndexNumber::SINGLE_BYTE,
+            _ => match value.len() {
+                3 => CodeIndexNumber::SYSTEM_COMMON_LEN3,
+                2 => CodeIndexNumber::SYSTEM_COMMON_LEN2,
+                1 => CodeIndexNumber::SYSTEM_COMMON_LEN1,
+                _ => panic!("shouldn't be reachable"),
+            },
         }
     }
 }
