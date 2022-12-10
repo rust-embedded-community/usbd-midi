@@ -1,11 +1,11 @@
 use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
 use crate::data::byte::u4::U4;
+use crate:: midi_types::MidiMessage;
 use core::convert::TryFrom;
 use midi_convert::{
     MidiRenderSlice,
     MidiTryParseSlice,
-    midi_types::MidiMessage,
 };
 
 
