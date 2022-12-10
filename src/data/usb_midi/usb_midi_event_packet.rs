@@ -4,6 +4,7 @@ use crate::data::byte::u4::U4;
 use crate:: midi_types::MidiMessage;
 use core::convert::TryFrom;
 use midi_convert::{
+    MidiParseError,
     MidiRenderSlice,
     MidiTryParseSlice,
 };
@@ -37,32 +38,27 @@ impl From<UsbMidiEventPacket> for [u8;4] {
 
 #[derive(Debug)]
 pub enum MidiPacketParsingError {
-    InvalidNote(u8),
-    InvalidCableNumber(u8),
-    InvalidEventType(u8),
-    MissingDataPacket
+    MissingCableNumber,
+    MissingDataPacket,
+    ParseError(MidiParseError),
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
     type Error = MidiPacketParsingError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let raw_cable_number= match value.get(0) {
+        let raw_cable_number = match value.get(0) {
             Some(byte) => *byte >> 4,
-            None => return Err(MidiPacketParsingError::MissingDataPacket)
+            None => return Err(MidiPacketParsingError::MissingCableNumber)
         };
 
-        let cable_number = match CableNumber::try_from(u8::from(raw_cable_number)) {
-            Ok(val) => val,
-            _ => return Err(MidiPacketParsingError::InvalidCableNumber(raw_cable_number))
-        };
-
+        let cable_number = CableNumber::try_from(u8::from(raw_cable_number)).expect("(u8 >> 4) < 16");
         let message_body = match value.get(1..) {
             Some(bytes) => bytes,
             None => return Err(MidiPacketParsingError::MissingDataPacket)
         };
 
-        let message = MidiMessage::try_parse_slice(message_body).map_err(|_| MidiPacketParsingError::MissingDataPacket)?;
+        let message = MidiMessage::try_parse_slice(message_body).map_err(|e| MidiPacketParsingError::ParseError(e))?;
 
         Ok(UsbMidiEventPacket {
             cable_number,
