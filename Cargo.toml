@@ -14,5 +14,5 @@ nb = "1.0.0"
 usb-device = "0.2.3"
 
 [dependencies.num_enum]
-version = "0.5.1"
+version = "0.6.1"
 default-features = false
