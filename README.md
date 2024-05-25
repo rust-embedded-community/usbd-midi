@@ -1,19 +1,16 @@
-usbd-midi
-=========
+# usbd-midi
 
-A simple usb midi device class for [usb-device](https://crates.io/crates/usb-device).
+A simple USB MIDI device class for [usb-device](https://crates.io/crates/usb-device).
 
-Currently this aims to be a very simple implementation, that allows the micro
-controller to send MIDI information to the PC and also receive MIDI information.
+Currently this aims to be a very simple implementation, that allows the microcontroller to send or receive MIDI information to/from a host like a desktop computer.
 
-This crate requires the use of a hardware driver, that implements the
-usb-device traits.
+This crate requires the use of a HAL that implements the `usb-device` traits.
 
 ## Example
 
 ### Receive MIDI
 
-Turn on the integrated LED of a STM32 BluePill board as long as C2 is pressed
+Turn on the integrated LED of a STM32 BluePill board as long as C2 is pressed.
 
 ```rust
 fn main() -> ! {
@@ -76,12 +73,12 @@ fn main() -> ! {
 
 Calling `MidiClass::new(&usb_bus, N, M);` with `N, M >= 1` to provide more
 than one input or output port requires the `control-buffer-256` feature of
-the usb-device crate:
+the `usb-device` crate:
 
 Cargo.toml:
 
 ```
-usb-device = { version = ">=0.2.1", features = ["control-buffer-256"] }
+usb-device = { version = ">=0.3.2", features = ["control-buffer-256"] }
 ```
 
 Up to 5 in/out pairs can be used this way until we again run out of buffer
