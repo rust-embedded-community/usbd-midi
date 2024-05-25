@@ -123,9 +123,9 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
         let midi_streaming_total_length = 7
             + (self.n_in_jacks + self.n_out_jacks) as usize
                 * (MIDI_IN_SIZE + MIDI_OUT_SIZE) as usize
-            + 7
+            + 9
             + (4 + self.n_out_jacks as usize)
-            + 7
+            + 9
             + (4 + self.n_in_jacks as usize);
 
         //Streaming extra info
@@ -206,7 +206,11 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
             0, // jack mappings. must be filled in and cropped.
         ];
 
-        writer.endpoint(&self.standard_bulkout)?; // len = 7
+        writer.endpoint_ex(&self.standard_bulkout, |data| {
+            data[0] = 0; // bRefresh
+            data[1] = 0; // bSynchAddress
+            Ok(2)
+        })?; // len = 9
 
         endpoint_data[1] = self.n_out_jacks;
         for i in 0..self.n_out_jacks {
@@ -218,7 +222,12 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
             &endpoint_data[0..2 + self.n_out_jacks as usize],
         )?;
 
-        writer.endpoint(&self.standard_bulkin)?; // len = 7
+        writer.endpoint_ex(&self.standard_bulkin, |data| {
+            data[0] = 0; // bRefresh
+            data[1] = 0; // bSynchAddress
+            Ok(2)
+        })?; // len = 9
+
         endpoint_data[1] = self.n_in_jacks;
         for i in 0..self.n_in_jacks {
             endpoint_data[2 + i as usize] = self.out_jack_id_emb(i);
