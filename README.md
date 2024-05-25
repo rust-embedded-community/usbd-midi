@@ -12,7 +12,9 @@ usb-device traits.
 ## Example
 
 ### Receive MIDI
+
 Turn on the integrated LED of a STM32 BluePill board as long as C2 is pressed
+
 ```rust
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
@@ -39,8 +41,8 @@ fn main() -> ! {
 
     let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
         .product("MIDI Test")
-        .device_class(USB_AUDIO_CLASS)
-        .device_sub_class(USB_MIDISTREAMING_SUBCLASS)
+        .device_class(0)
+        .device_sub_class(0)
         .build();
 
     loop {
@@ -77,6 +79,7 @@ than one input or output port requires the `control-buffer-256` feature of
 the usb-device crate:
 
 Cargo.toml:
+
 ```
 usb-device = { version = ">=0.2.1", features = ["control-buffer-256"] }
 ```
