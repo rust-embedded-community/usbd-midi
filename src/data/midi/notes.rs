@@ -139,9 +139,9 @@ pub enum Note {
     Gs9,
 }
 
-impl Into<u8> for Note {
-    fn into(self) -> u8 {
-        self as u8
+impl From<Note> for u8 {
+    fn from(val: Note) -> Self {
+        val as u8
     }
 }
 

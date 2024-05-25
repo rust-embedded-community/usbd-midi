@@ -23,13 +23,10 @@ impl<'a> Iterator for MidiPacketBufferReader<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.position <= MAX_PACKET_SIZE && self.position < self.raw_bytes_received {
-            let packet = match self
+            let packet = self
                 .buffer
                 .get(self.position..(self.position + MIDI_PACKET_SIZE))
-            {
-                Some(packet) => Some(UsbMidiEventPacket::try_from(packet)),
-                None => None,
-            };
+                .map(UsbMidiEventPacket::try_from);
 
             self.position += MIDI_PACKET_SIZE;
             return packet;

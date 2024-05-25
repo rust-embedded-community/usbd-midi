@@ -47,12 +47,12 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
     type Error = MidiPacketParsingError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let raw_cable_number = match value.get(0) {
+        let raw_cable_number = match value.first() {
             Some(byte) => *byte >> 4,
             None => return Err(MidiPacketParsingError::MissingDataPacket),
         };
 
-        let cable_number = match CableNumber::try_from(u8::from(raw_cable_number)) {
+        let cable_number = match CableNumber::try_from(raw_cable_number) {
             Ok(val) => val,
             _ => return Err(MidiPacketParsingError::InvalidCableNumber(raw_cable_number)),
         };

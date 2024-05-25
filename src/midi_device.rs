@@ -66,23 +66,23 @@ impl<B: UsbBus> MidiClass<'_, B> {
     /// calculates the index'th external midi in jack id
     fn in_jack_id_ext(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_in_jacks);
-        return 2 * index + 1;
+        2 * index + 1
     }
     /// calculates the index'th embedded midi out jack id
     fn out_jack_id_emb(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_in_jacks);
-        return 2 * index + 2;
+        2 * index + 2
     }
 
     /// calculates the index'th external midi out jack id
     fn out_jack_id_ext(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_out_jacks);
-        return 2 * self.n_in_jacks + 2 * index + 1;
+        2 * self.n_in_jacks + 2 * index + 1
     }
     /// calculates the index'th embedded midi in jack id
     fn in_jack_id_emb(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_out_jacks);
-        return 2 * self.n_in_jacks + 2 * index + 2;
+        2 * self.n_in_jacks + 2 * index + 2
     }
 }
 
