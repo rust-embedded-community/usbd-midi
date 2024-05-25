@@ -12,5 +12,5 @@ license = "MIT"
 usb-device = "0.3.2"
 
 [dependencies.num_enum]
-version = "0.5.1"
+version = "0.7.2"
 default-features = false
