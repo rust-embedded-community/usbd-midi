@@ -10,3 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Updated `usb-device` dependency to 0.3.2.
+
+### Removed
+
+- Removed unused `embedded-hal` and `nb` dependencies.
