@@ -1,60 +1,71 @@
-use core::convert::TryFrom;
 use crate::data::byte::u4::U4;
+use core::convert::TryFrom;
 
-/// The Cable Number (CN) is a value ranging from 0x0 to 0xF 
-/// indicating the number assignment of the Embedded MIDI Jack associated 
+/// The Cable Number (CN) is a value ranging from 0x0 to 0xF
+/// indicating the number assignment of the Embedded MIDI Jack associated
 /// with the endpoint that is transferring the data
-#[derive(Debug,Clone,Copy,Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum CableNumber {
-    Cable0  = 0x0, Cable1  = 0x1, Cable2  = 0x2, Cable3  = 0x3,
-    Cable4  = 0x4, Cable5  = 0x5, Cable6  = 0x6, Cable7  = 0x7,
-    Cable8  = 0x8, Cable9  = 0x9, Cable10 = 0xA, Cable11 = 0xB,
-    Cable12 = 0xC, Cable13 = 0xD, Cable14 = 0xE, Cable15 = 0xF
+    Cable0 = 0x0,
+    Cable1 = 0x1,
+    Cable2 = 0x2,
+    Cable3 = 0x3,
+    Cable4 = 0x4,
+    Cable5 = 0x5,
+    Cable6 = 0x6,
+    Cable7 = 0x7,
+    Cable8 = 0x8,
+    Cable9 = 0x9,
+    Cable10 = 0xA,
+    Cable11 = 0xB,
+    Cable12 = 0xC,
+    Cable13 = 0xD,
+    Cable14 = 0xE,
+    Cable15 = 0xF,
 }
 pub struct InvalidCableNumber(u8);
 
 impl TryFrom<u8> for CableNumber {
     type Error = InvalidCableNumber;
-    fn try_from(value:u8) -> Result<Self,Self::Error> {
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
-            x if x == CableNumber::Cable0  as u8 => Ok(CableNumber::Cable0),
-            x if x == CableNumber::Cable1  as u8 => Ok(CableNumber::Cable1),
-            x if x == CableNumber::Cable2  as u8 => Ok(CableNumber::Cable2),
-            x if x == CableNumber::Cable3  as u8 => Ok(CableNumber::Cable3),
-            x if x == CableNumber::Cable4  as u8 => Ok(CableNumber::Cable4),
-            x if x == CableNumber::Cable5  as u8 => Ok(CableNumber::Cable5),
-            x if x == CableNumber::Cable6  as u8 => Ok(CableNumber::Cable6),
-            x if x == CableNumber::Cable7  as u8 => Ok(CableNumber::Cable7),
-            x if x == CableNumber::Cable8  as u8 => Ok(CableNumber::Cable8),
-            x if x == CableNumber::Cable9  as u8 => Ok(CableNumber::Cable9),
+            x if x == CableNumber::Cable0 as u8 => Ok(CableNumber::Cable0),
+            x if x == CableNumber::Cable1 as u8 => Ok(CableNumber::Cable1),
+            x if x == CableNumber::Cable2 as u8 => Ok(CableNumber::Cable2),
+            x if x == CableNumber::Cable3 as u8 => Ok(CableNumber::Cable3),
+            x if x == CableNumber::Cable4 as u8 => Ok(CableNumber::Cable4),
+            x if x == CableNumber::Cable5 as u8 => Ok(CableNumber::Cable5),
+            x if x == CableNumber::Cable6 as u8 => Ok(CableNumber::Cable6),
+            x if x == CableNumber::Cable7 as u8 => Ok(CableNumber::Cable7),
+            x if x == CableNumber::Cable8 as u8 => Ok(CableNumber::Cable8),
+            x if x == CableNumber::Cable9 as u8 => Ok(CableNumber::Cable9),
             x if x == CableNumber::Cable10 as u8 => Ok(CableNumber::Cable10),
             x if x == CableNumber::Cable11 as u8 => Ok(CableNumber::Cable11),
             x if x == CableNumber::Cable12 as u8 => Ok(CableNumber::Cable12),
             x if x == CableNumber::Cable13 as u8 => Ok(CableNumber::Cable13),
             x if x == CableNumber::Cable14 as u8 => Ok(CableNumber::Cable14),
             x if x == CableNumber::Cable15 as u8 => Ok(CableNumber::Cable15),
-            _ => Err(InvalidCableNumber(value))
+            _ => Err(InvalidCableNumber(value)),
         }
     }
-
 }
 
-impl From<CableNumber> for u8{
-    fn from(value:CableNumber) -> u8 {
+impl From<CableNumber> for u8 {
+    fn from(value: CableNumber) -> u8 {
         value as u8
     }
 }
 
-impl From<CableNumber> for U4{
-    fn from(value:CableNumber) -> U4 {
+impl From<CableNumber> for U4 {
+    fn from(value: CableNumber) -> U4 {
         U4::from_overflowing_u8(u8::from(value))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    
+
     use super::*;
     macro_rules! cable_test {
         ($($id:ident:$value:expr,)*) => {

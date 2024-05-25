@@ -1,102 +1,271 @@
-use crate::data::byte::u7::U7;
 use crate::data::byte::from_traits::FromOverFlow;
+use crate::data::byte::u7::U7;
 use num_enum::TryFromPrimitive;
 /// A simple enum type that represents all the midi 'notes'
 /// note the flat versions are associated constants
 /// but can be referenced like Note::Bb3
 /// C1m is the C-1
-#[derive(Debug,Copy,Clone,TryFromPrimitive,Eq,PartialEq)]
+#[derive(Debug, Copy, Clone, TryFromPrimitive, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Note {
-    C1m, Cs1m, D1m, Ds1m, E1m, F1m, Fs1m, G1m, Gs1m, A1m, As1m, B1m,
-    C0 , Cs0 , D0 , Ds0 , E0 , F0 , Fs0 , G0 , Gs0 , A0 , As0 , B0 ,
-    C1 , Cs1 , D1 , Ds1 , E1 , F1 , Fs1 , G1 , Gs1 , A1 , As1 , B1 , 
-    C2 , Cs2 , D2 , Ds2 , E2 , F2 , Fs2 , G2 , Gs2 , A2 , As2 , B2 ,
-    C3 , Cs3 , D3 , Ds3 , E3 , F3 , Fs3 , G3 , Gs3 , A3 , As3 , B3 ,
-    C4 , Cs4 , D4 , Ds4 , E4 , F4 , Fs4 , G4 , Gs4 , A4 , As4 , B4 ,
-    C5 , Cs5 , D5 , Ds5 , E5 , F5 , Fs5 , G5 , Gs5 , A5 , As5 , B5 ,
-    C6 , Cs6 , D6 , Ds6 , E6 , F6 , Fs6 , G6 , Gs6 , A6 , As6 , B6 ,
-    C7 , Cs7 , D7 , Ds7 , E7 , F7 , Fs7 , G7 , Gs7 , A7 , As7 , B7 ,
-    C8 , Cs8 , D8 , Ds8 , E8 , F8 , Fs8 , G8 , Gs8 , A8 , As8 , B8 ,
-    C9 , Cs9 , D9 , Ds9 , E9 , F9 , Fs9 , G9 , Gs9
+    C1m,
+    Cs1m,
+    D1m,
+    Ds1m,
+    E1m,
+    F1m,
+    Fs1m,
+    G1m,
+    Gs1m,
+    A1m,
+    As1m,
+    B1m,
+    C0,
+    Cs0,
+    D0,
+    Ds0,
+    E0,
+    F0,
+    Fs0,
+    G0,
+    Gs0,
+    A0,
+    As0,
+    B0,
+    C1,
+    Cs1,
+    D1,
+    Ds1,
+    E1,
+    F1,
+    Fs1,
+    G1,
+    Gs1,
+    A1,
+    As1,
+    B1,
+    C2,
+    Cs2,
+    D2,
+    Ds2,
+    E2,
+    F2,
+    Fs2,
+    G2,
+    Gs2,
+    A2,
+    As2,
+    B2,
+    C3,
+    Cs3,
+    D3,
+    Ds3,
+    E3,
+    F3,
+    Fs3,
+    G3,
+    Gs3,
+    A3,
+    As3,
+    B3,
+    C4,
+    Cs4,
+    D4,
+    Ds4,
+    E4,
+    F4,
+    Fs4,
+    G4,
+    Gs4,
+    A4,
+    As4,
+    B4,
+    C5,
+    Cs5,
+    D5,
+    Ds5,
+    E5,
+    F5,
+    Fs5,
+    G5,
+    Gs5,
+    A5,
+    As5,
+    B5,
+    C6,
+    Cs6,
+    D6,
+    Ds6,
+    E6,
+    F6,
+    Fs6,
+    G6,
+    Gs6,
+    A6,
+    As6,
+    B6,
+    C7,
+    Cs7,
+    D7,
+    Ds7,
+    E7,
+    F7,
+    Fs7,
+    G7,
+    Gs7,
+    A7,
+    As7,
+    B7,
+    C8,
+    Cs8,
+    D8,
+    Ds8,
+    E8,
+    F8,
+    Fs8,
+    G8,
+    Gs8,
+    A8,
+    As8,
+    B8,
+    C9,
+    Cs9,
+    D9,
+    Ds9,
+    E9,
+    F9,
+    Fs9,
+    G9,
+    Gs9,
 }
-
 
 impl Into<u8> for Note {
     fn into(self) -> u8 {
-        self as u8 
+        self as u8
     }
 }
 
 impl From<Note> for U7 {
-    fn from(value:Note) -> U7{
+    fn from(value: Note) -> U7 {
         let byte = value as u8;
         U7::from_overflow(byte)
     }
 }
 
-
 impl Note {
-    #[allow(non_upper_case_globals)] pub const Db1m : Note = Note::Cs1m;
-    #[allow(non_upper_case_globals)] pub const Eb1m : Note = Note::Ds1m;
-    #[allow(non_upper_case_globals)] pub const Gb1m : Note = Note::Fs1m;
-    #[allow(non_upper_case_globals)] pub const Ab1m : Note = Note::Gs1m;
-    #[allow(non_upper_case_globals)] pub const Bb1m : Note = Note::As1m;
-    #[allow(non_upper_case_globals)] pub const Db0 : Note = Note::Cs0;
-    #[allow(non_upper_case_globals)] pub const Eb0 : Note = Note::Ds0;
-    #[allow(non_upper_case_globals)] pub const Gb0 : Note = Note::Fs0;
-    #[allow(non_upper_case_globals)] pub const Ab0 : Note = Note::Gs0;
-    #[allow(non_upper_case_globals)] pub const Bb0 : Note = Note::As0;
-    #[allow(non_upper_case_globals)] pub const Db1 : Note = Note::Cs1;
-    #[allow(non_upper_case_globals)] pub const Eb1 : Note = Note::Ds1;
-    #[allow(non_upper_case_globals)] pub const Gb1 : Note = Note::Fs1;
-    #[allow(non_upper_case_globals)] pub const Ab1 : Note = Note::Gs1;
-    #[allow(non_upper_case_globals)] pub const Bb1 : Note = Note::As1;
-    #[allow(non_upper_case_globals)] pub const Db2 : Note = Note::Cs2;
-    #[allow(non_upper_case_globals)] pub const Eb2 : Note = Note::Ds2;
-    #[allow(non_upper_case_globals)] pub const Gb2 : Note = Note::Fs2;
-    #[allow(non_upper_case_globals)] pub const Ab2 : Note = Note::Gs2;
-    #[allow(non_upper_case_globals)] pub const Bb2 : Note = Note::As2;
-    #[allow(non_upper_case_globals)] pub const Db3 : Note = Note::Cs3;
-    #[allow(non_upper_case_globals)] pub const Eb3 : Note = Note::Ds3;
-    #[allow(non_upper_case_globals)] pub const Gb3 : Note = Note::Fs3;
-    #[allow(non_upper_case_globals)] pub const Ab3 : Note = Note::Gs3;
-    #[allow(non_upper_case_globals)] pub const Bb3 : Note = Note::As3;
-    #[allow(non_upper_case_globals)] pub const Db4 : Note = Note::Cs4;
-    #[allow(non_upper_case_globals)] pub const Eb4 : Note = Note::Ds4;
-    #[allow(non_upper_case_globals)] pub const Gb4 : Note = Note::Fs4;
-    #[allow(non_upper_case_globals)] pub const Ab4 : Note = Note::Gs4;
-    #[allow(non_upper_case_globals)] pub const Bb4 : Note = Note::As4;
-    #[allow(non_upper_case_globals)] pub const Db5 : Note = Note::Cs5;
-    #[allow(non_upper_case_globals)] pub const Eb5 : Note = Note::Ds5;
-    #[allow(non_upper_case_globals)] pub const Gb5 : Note = Note::Fs5;
-    #[allow(non_upper_case_globals)] pub const Ab5 : Note = Note::Gs5;
-    #[allow(non_upper_case_globals)] pub const Bb5 : Note = Note::As5;
-    #[allow(non_upper_case_globals)] pub const Db6 : Note = Note::Cs6;
-    #[allow(non_upper_case_globals)] pub const Eb6 : Note = Note::Ds6;
-    #[allow(non_upper_case_globals)] pub const Gb6 : Note = Note::Fs6;
-    #[allow(non_upper_case_globals)] pub const Ab6 : Note = Note::Gs6;
-    #[allow(non_upper_case_globals)] pub const Bb6 : Note = Note::As6;
-    #[allow(non_upper_case_globals)] pub const Db7 : Note = Note::Cs7;
-    #[allow(non_upper_case_globals)] pub const Eb7 : Note = Note::Ds7;
-    #[allow(non_upper_case_globals)] pub const Gb7 : Note = Note::Fs7;
-    #[allow(non_upper_case_globals)] pub const Ab7 : Note = Note::Gs7;
-    #[allow(non_upper_case_globals)] pub const Bb7 : Note = Note::As7;
-    #[allow(non_upper_case_globals)] pub const Db8 : Note = Note::Cs8;
-    #[allow(non_upper_case_globals)] pub const Eb8 : Note = Note::Ds8;
-    #[allow(non_upper_case_globals)] pub const Gb8 : Note = Note::Fs8;
-    #[allow(non_upper_case_globals)] pub const Ab8 : Note = Note::Gs8;
-    #[allow(non_upper_case_globals)] pub const Bb8 : Note = Note::As8;
-    #[allow(non_upper_case_globals)] pub const Db9 : Note = Note::Cs9;
-    #[allow(non_upper_case_globals)] pub const Eb9 : Note = Note::Ds9;
-    #[allow(non_upper_case_globals)] pub const Gb9 : Note = Note::Fs9;
-    #[allow(non_upper_case_globals)] pub const Ab9 : Note = Note::Gs9;
+    #[allow(non_upper_case_globals)]
+    pub const Db1m: Note = Note::Cs1m;
+    #[allow(non_upper_case_globals)]
+    pub const Eb1m: Note = Note::Ds1m;
+    #[allow(non_upper_case_globals)]
+    pub const Gb1m: Note = Note::Fs1m;
+    #[allow(non_upper_case_globals)]
+    pub const Ab1m: Note = Note::Gs1m;
+    #[allow(non_upper_case_globals)]
+    pub const Bb1m: Note = Note::As1m;
+    #[allow(non_upper_case_globals)]
+    pub const Db0: Note = Note::Cs0;
+    #[allow(non_upper_case_globals)]
+    pub const Eb0: Note = Note::Ds0;
+    #[allow(non_upper_case_globals)]
+    pub const Gb0: Note = Note::Fs0;
+    #[allow(non_upper_case_globals)]
+    pub const Ab0: Note = Note::Gs0;
+    #[allow(non_upper_case_globals)]
+    pub const Bb0: Note = Note::As0;
+    #[allow(non_upper_case_globals)]
+    pub const Db1: Note = Note::Cs1;
+    #[allow(non_upper_case_globals)]
+    pub const Eb1: Note = Note::Ds1;
+    #[allow(non_upper_case_globals)]
+    pub const Gb1: Note = Note::Fs1;
+    #[allow(non_upper_case_globals)]
+    pub const Ab1: Note = Note::Gs1;
+    #[allow(non_upper_case_globals)]
+    pub const Bb1: Note = Note::As1;
+    #[allow(non_upper_case_globals)]
+    pub const Db2: Note = Note::Cs2;
+    #[allow(non_upper_case_globals)]
+    pub const Eb2: Note = Note::Ds2;
+    #[allow(non_upper_case_globals)]
+    pub const Gb2: Note = Note::Fs2;
+    #[allow(non_upper_case_globals)]
+    pub const Ab2: Note = Note::Gs2;
+    #[allow(non_upper_case_globals)]
+    pub const Bb2: Note = Note::As2;
+    #[allow(non_upper_case_globals)]
+    pub const Db3: Note = Note::Cs3;
+    #[allow(non_upper_case_globals)]
+    pub const Eb3: Note = Note::Ds3;
+    #[allow(non_upper_case_globals)]
+    pub const Gb3: Note = Note::Fs3;
+    #[allow(non_upper_case_globals)]
+    pub const Ab3: Note = Note::Gs3;
+    #[allow(non_upper_case_globals)]
+    pub const Bb3: Note = Note::As3;
+    #[allow(non_upper_case_globals)]
+    pub const Db4: Note = Note::Cs4;
+    #[allow(non_upper_case_globals)]
+    pub const Eb4: Note = Note::Ds4;
+    #[allow(non_upper_case_globals)]
+    pub const Gb4: Note = Note::Fs4;
+    #[allow(non_upper_case_globals)]
+    pub const Ab4: Note = Note::Gs4;
+    #[allow(non_upper_case_globals)]
+    pub const Bb4: Note = Note::As4;
+    #[allow(non_upper_case_globals)]
+    pub const Db5: Note = Note::Cs5;
+    #[allow(non_upper_case_globals)]
+    pub const Eb5: Note = Note::Ds5;
+    #[allow(non_upper_case_globals)]
+    pub const Gb5: Note = Note::Fs5;
+    #[allow(non_upper_case_globals)]
+    pub const Ab5: Note = Note::Gs5;
+    #[allow(non_upper_case_globals)]
+    pub const Bb5: Note = Note::As5;
+    #[allow(non_upper_case_globals)]
+    pub const Db6: Note = Note::Cs6;
+    #[allow(non_upper_case_globals)]
+    pub const Eb6: Note = Note::Ds6;
+    #[allow(non_upper_case_globals)]
+    pub const Gb6: Note = Note::Fs6;
+    #[allow(non_upper_case_globals)]
+    pub const Ab6: Note = Note::Gs6;
+    #[allow(non_upper_case_globals)]
+    pub const Bb6: Note = Note::As6;
+    #[allow(non_upper_case_globals)]
+    pub const Db7: Note = Note::Cs7;
+    #[allow(non_upper_case_globals)]
+    pub const Eb7: Note = Note::Ds7;
+    #[allow(non_upper_case_globals)]
+    pub const Gb7: Note = Note::Fs7;
+    #[allow(non_upper_case_globals)]
+    pub const Ab7: Note = Note::Gs7;
+    #[allow(non_upper_case_globals)]
+    pub const Bb7: Note = Note::As7;
+    #[allow(non_upper_case_globals)]
+    pub const Db8: Note = Note::Cs8;
+    #[allow(non_upper_case_globals)]
+    pub const Eb8: Note = Note::Ds8;
+    #[allow(non_upper_case_globals)]
+    pub const Gb8: Note = Note::Fs8;
+    #[allow(non_upper_case_globals)]
+    pub const Ab8: Note = Note::Gs8;
+    #[allow(non_upper_case_globals)]
+    pub const Bb8: Note = Note::As8;
+    #[allow(non_upper_case_globals)]
+    pub const Db9: Note = Note::Cs9;
+    #[allow(non_upper_case_globals)]
+    pub const Eb9: Note = Note::Ds9;
+    #[allow(non_upper_case_globals)]
+    pub const Gb9: Note = Note::Fs9;
+    #[allow(non_upper_case_globals)]
+    pub const Ab9: Note = Note::Gs9;
 }
-
 
 #[cfg(test)]
 mod tests {
-    
+
     use super::*;
     macro_rules! note_test {
         ($($id:ident:$value:expr,)*) => {

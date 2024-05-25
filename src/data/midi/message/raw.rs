@@ -4,7 +4,7 @@ use crate::data::byte::u7::U7;
 pub enum Payload {
     Empty,
     SingleByte(U7),
-    DoubleByte(U7,U7)
+    DoubleByte(U7, U7),
 }
 
 /// A struct that captures the valid states
@@ -14,5 +14,5 @@ pub enum Payload {
 /// the data makes sense though!
 pub struct Raw {
     pub status: u8,
-    pub payload: Payload
+    pub payload: Payload,
 }
