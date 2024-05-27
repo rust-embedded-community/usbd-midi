@@ -1,4 +1,8 @@
-//This should be better organized in future
+//! Constants for use in USB descriptors.
+
+#![allow(missing_docs)]
+
+// TODO: this should be better organized in future.
 
 pub const USB_CLASS_NONE: u8 = 0x00;
 pub const USB_AUDIO_CLASS: u8 = 0x01;

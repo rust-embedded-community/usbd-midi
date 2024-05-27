@@ -1,3 +1,5 @@
+//! Enum representing the MIDI message.
+
 pub mod control_function;
 pub mod raw;
 
@@ -12,18 +14,26 @@ use core::convert::TryFrom;
 
 type Velocity = U7;
 
-/// Represents midi messages
+/// Represents midi messages.
+///
 /// Note: not current exhaustive and SysEx messages end up
 /// being a confusing case. So are currently note implemented
 /// they are sort-of unbounded
 #[derive(Debug, Eq, PartialEq)]
 pub enum Message {
+    /// Note On message.
     NoteOff(Channel, Note, Velocity),
+    /// Note Off message.
     NoteOn(Channel, Note, Velocity),
+    /// Polyphonic aftertouch (poly-pressure) message.
     PolyphonicAftertouch(Channel, Note, U7),
+    /// Program change message.
     ProgramChange(Channel, U7),
+    /// Channel aftertouch message.
     ChannelAftertouch(Channel, U7),
+    /// Pitchwheel message.
     PitchWheelChange(Channel, U7, U7),
+    /// Control Change (CC) message.
     ControlChange(Channel, ControlFunction, U7),
 }
 

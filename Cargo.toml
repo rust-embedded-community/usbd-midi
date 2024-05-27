@@ -20,3 +20,6 @@ usb-device = "0.3.2"
 [dependencies.num_enum]
 version = "0.7.2"
 default-features = false
+
+[lints.rust]
+missing_docs = "warn"

@@ -1,9 +1,12 @@
+//! Enum representing the cable number of a packet.
+
 use crate::data::byte::u4::U4;
 use core::convert::TryFrom;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF
 /// indicating the number assignment of the Embedded MIDI Jack associated
 /// with the endpoint that is transferring the data
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum CableNumber {
@@ -24,6 +27,8 @@ pub enum CableNumber {
     Cable14 = 0xE,
     Cable15 = 0xF,
 }
+
+/// Error indicating an invalid cable number.
 pub struct InvalidCableNumber(u8);
 
 impl TryFrom<u8> for CableNumber {

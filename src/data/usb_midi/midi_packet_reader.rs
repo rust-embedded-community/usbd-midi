@@ -1,7 +1,10 @@
+//! Reader for received packets.
+
 use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 use crate::midi_device::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
 use core::convert::TryFrom;
 
+/// Packet reader with internal buffer for received message.
 pub struct MidiPacketBufferReader<'a> {
     buffer: &'a [u8; MAX_PACKET_SIZE],
     position: usize,
@@ -9,6 +12,7 @@ pub struct MidiPacketBufferReader<'a> {
 }
 
 impl<'a> MidiPacketBufferReader<'a> {
+    /// Creates a new reader.
     pub fn new(buffer: &'a [u8; MAX_PACKET_SIZE], raw_bytes_received: usize) -> Self {
         MidiPacketBufferReader {
             buffer,

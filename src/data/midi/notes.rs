@@ -1,10 +1,15 @@
+//! Enum representing the MIDI notes.
+
 use crate::data::byte::from_traits::FromOverFlow;
 use crate::data::byte::u7::U7;
 use num_enum::TryFromPrimitive;
-/// A simple enum type that represents all the midi 'notes'
-/// note the flat versions are associated constants
+
+/// A simple enum type that represents all the midi 'notes'.
+///
+/// Note the flat versions are associated constants
 /// but can be referenced like Note::Bb3
 /// C1m is the C-1
+#[allow(missing_docs)]
 #[derive(Debug, Copy, Clone, TryFromPrimitive, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Note {
@@ -152,6 +157,7 @@ impl From<Note> for U7 {
     }
 }
 
+#[allow(missing_docs)]
 impl Note {
     #[allow(non_upper_case_globals)]
     pub const Db1m: Note = Note::Cs1m;

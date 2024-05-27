@@ -1,10 +1,15 @@
+//! Control function definitions.
+
 use crate::data::byte::u7::U7;
 
+/// Custom type for a control function.
 #[derive(Debug, Eq, PartialEq)]
 pub struct ControlFunction(pub U7);
 
-/// Control Functions as defined in the MIDI 1.0 Specification
-/// Source: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
+/// Control Functions as defined in the MIDI 1.0 Specification.
+///
+/// Source: <https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2>
+#[allow(missing_docs)]
 impl ControlFunction {
     pub const BANK_SELECT_0: Self = ControlFunction(U7(0));
     pub const MOD_WHEEL_1: Self = ControlFunction(U7(1));

@@ -1,29 +1,49 @@
+//! Enum representing the MIDI channel.
+
 use core::convert::TryFrom;
 
-/// The Channel is a value ranging from 0x0 to 0xF
-/// This is a standard midi concept
-/// Note Channel1 = 0 on the wire
+/// The Channel is a value ranging from 0x0 to 0xF.
+///
+/// This is a standard midi concept.
+/// Note Channel1 = 0 on the wire.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Channel {
+    /// MIDI channel 1.
     Channel1 = 0x0,
+    /// MIDI channel 2.
     Channel2 = 0x1,
+    /// MIDI channel 3.
     Channel3 = 0x2,
+    /// MIDI channel 4.
     Channel4 = 0x3,
+    /// MIDI channel 5.
     Channel5 = 0x4,
+    /// MIDI channel 6.
     Channel6 = 0x5,
+    /// MIDI channel 7.
     Channel7 = 0x6,
+    /// MIDI channel 8.
     Channel8 = 0x7,
+    /// MIDI channel 9.
     Channel9 = 0x8,
+    /// MIDI channel 10.
     Channel10 = 0x9,
+    /// MIDI channel 11.
     Channel11 = 0xA,
+    /// MIDI channel 12.
     Channel12 = 0xB,
+    /// MIDI channel 13.
     Channel13 = 0xC,
+    /// MIDI channel 14.
     Channel14 = 0xD,
+    /// MIDI channel 15.
     Channel15 = 0xE,
+    /// MIDI channel 16.
     Channel16 = 0xF,
 }
 
+/// Error indicating an invalid MIDI channel.
 pub struct InvalidChannel(u8);
 
 impl TryFrom<u8> for Channel {

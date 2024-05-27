@@ -1,6 +1,8 @@
+//! A primitive value with 4-bit length.
+
 use core::convert::TryFrom;
 
-/// A primitive value that can be from 0-0x7F
+/// A primitive value that can be from 0-0x0F
 pub struct U4(u8);
 
 /// Error representing that this value is not a valid u4
@@ -25,7 +27,9 @@ impl From<U4> for u8 {
 }
 
 impl U4 {
+    /// Maximum value for the type.
     pub const MAX: U4 = U4(0x0F);
+    /// Minimum value for the type.
     pub const MIN: U4 = U4(0);
 
     /// Combines two nibbles (u4) eg half byte

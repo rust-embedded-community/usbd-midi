@@ -1,3 +1,5 @@
+//! Representation of a USB MIDI event packet.
+
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload, Raw};
 use crate::data::midi::message::Message;
@@ -5,12 +7,15 @@ use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
 use core::convert::TryFrom;
 
-/// A packet that communicates with the host
+/// A packet that communicates with the host.
+///
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
 #[derive(Debug, Eq, PartialEq)]
 pub struct UsbMidiEventPacket {
+    /// Cable number of the packet.
     pub cable_number: CableNumber,
+    /// Message payload.
     pub message: Message,
 }
 
@@ -35,11 +40,16 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
     }
 }
 
+/// Error variants for parsing the packet.
 #[derive(Debug)]
 pub enum MidiPacketParsingError {
+    /// Invalid note.
     InvalidNote(u8),
+    /// Invalid cable number.
     InvalidCableNumber(u8),
+    /// Invalid event type.
     InvalidEventType(u8),
+    /// Missing data packet.
     MissingDataPacket,
 }
 
@@ -72,6 +82,7 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 }
 
 impl UsbMidiEventPacket {
+    /// Creates a packet from a MIDI message and returns it.
     pub fn from_midi(cable: CableNumber, midi: Message) -> UsbMidiEventPacket {
         UsbMidiEventPacket {
             cable_number: cable,

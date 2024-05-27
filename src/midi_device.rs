@@ -1,3 +1,5 @@
+//! Contains the class implementation.
+
 use crate::data::usb::constants::*;
 use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 use usb_device::class_prelude::*;
@@ -6,12 +8,13 @@ use usb_device::Result;
 const MIDI_IN_SIZE: u8 = 0x06;
 const MIDI_OUT_SIZE: u8 = 0x09;
 
+/// Size of a single packet in bytes.
 pub const MIDI_PACKET_SIZE: usize = 4;
+
+/// Maximum transfer size of an endpoint.
 pub const MAX_PACKET_SIZE: usize = 64;
 
-///Note we are using MidiIn here to refer to the fact that
-///The Host sees it as a midi in device
-///This class allows you to send data in
+/// Packet-level implementation of a USB MIDI device.
 pub struct MidiClass<'a, B: UsbBus> {
     standard_ac: InterfaceNumber,
     standard_mc: InterfaceNumber,
@@ -21,18 +24,22 @@ pub struct MidiClass<'a, B: UsbBus> {
     n_out_jacks: u8,
 }
 
+/// Error variants for read operations.
 pub enum MidiReadError {
+    /// Parsing of the packet failed.
     ParsingFailed(MidiPacketParsingError),
+    /// USB stack error returned from `usb-device`.
     UsbError(UsbError),
 }
 
+/// Error returned when passing invalid arguments to `MidiClass::new`.
 #[derive(Debug)]
 pub struct InvalidArguments;
 
 impl<B: UsbBus> MidiClass<'_, B> {
-    /// Creates a new MidiClass with the provided UsbBus and `n_in/out_jacks` embedded input/output jacks (or "cables",
-    /// depending on the terminology).
-    /// Note that a maximum of 16 in and 16 out jacks are supported.
+    /// Creates a new MidiClass with the provided UsbBus and `n_in/out_jacks` embedded input/output jacks
+    /// (or "cables", depending on the terminology).
+    /// Note that a maximum of 16 in and 16 out jacks is supported.
     pub fn new(
         alloc: &UsbBusAllocator<B>,
         n_in_jacks: u8,
@@ -51,35 +58,41 @@ impl<B: UsbBus> MidiClass<'_, B> {
         })
     }
 
+    /// Sends bytes from a 4-byte buffer and returns either the transferred size or an error.
     pub fn send_bytes(&mut self, buffer: [u8; 4]) -> Result<usize> {
         self.standard_bulkin.write(&buffer)
     }
+
+    /// Sends a `UsbMidiEventPacket` and returns either the transferred size or an error.
     pub fn send_message(&mut self, usb_midi: UsbMidiEventPacket) -> Result<usize> {
         let bytes: [u8; MIDI_PACKET_SIZE] = usb_midi.into();
         self.standard_bulkin.write(&bytes)
     }
 
+    /// Reads received bytes into a buffer and returns either the transferred size or an error.
     pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize> {
         self.standard_bulkout.read(buffer)
     }
 
-    /// calculates the index'th external midi in jack id
+    /// Calculates the index'th external midi in jack id.
     fn in_jack_id_ext(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_in_jacks);
         2 * index + 1
     }
-    /// calculates the index'th embedded midi out jack id
+
+    /// Calculates the index'th embedded midi out jack id.
     fn out_jack_id_emb(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_in_jacks);
         2 * index + 2
     }
 
-    /// calculates the index'th external midi out jack id
+    /// Calculates the index'th external midi out jack id.
     fn out_jack_id_ext(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_out_jacks);
         2 * self.n_in_jacks + 2 * index + 1
     }
-    /// calculates the index'th embedded midi in jack id
+
+    /// Calculates the index'th embedded midi in jack id.
     fn in_jack_id_emb(&self, index: u8) -> u8 {
         debug_assert!(index < self.n_out_jacks);
         2 * self.n_in_jacks + 2 * index + 2
@@ -88,12 +101,12 @@ impl<B: UsbBus> MidiClass<'_, B> {
 
 impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
     fn get_configuration_descriptors(&self, writer: &mut DescriptorWriter) -> Result<()> {
-        //AUDIO CONTROL STANDARD
+        // AUDIO CONTROL STANDARD
         writer.interface(
             self.standard_ac,
             USB_AUDIO_CLASS,
             USB_AUDIOCONTROL_SUBCLASS,
-            0, //no protocol,
+            0, // no protocol,
         )?;
 
         // AUDIO CONTROL EXTRA INFO
@@ -104,20 +117,19 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 0x00,
                 0x01, // REVISION
                 0x09,
-                0x00, //SIZE of class specific descriptions
-                0x01, //Number of streaming interfaces
+                0x00, // SIZE of class specific descriptions
+                0x01, // Number of streaming interfaces
                 0x01, // MIDIStreaming interface 1 belongs to this AC interface
             ],
         )?;
 
-        //Streaming Standard
-
+        // Streaming Standard
         writer.interface(
             self.standard_mc,
             USB_AUDIO_CLASS,
             USB_MIDISTREAMING_SUBCLASS,
-            0, //no protocol
-        )?; //Num endpoints?
+            0, // no protocol
+        )?; // Num endpoints?
 
         let midi_streaming_start_byte = writer.position();
         let midi_streaming_total_length = 7
@@ -128,7 +140,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
             + 9
             + (4 + self.n_in_jacks as usize);
 
-        //Streaming extra info
+        // Streaming extra info
         writer.write(
             // len = 7
             CS_INTERFACE,
@@ -141,7 +153,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
             ],
         )?;
 
-        //JACKS
+        // JACKS
         for i in 0..self.n_in_jacks {
             writer.write(
                 // len = 6 = MIDI_IN_SIZE
@@ -175,7 +187,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 &[
                     MIDI_OUT_JACK_SUBTYPE,
                     EXTERNAL,
-                    self.out_jack_id_ext(i), //id
+                    self.out_jack_id_ext(i), // id
                     0x01,                    // 1 pin
                     self.in_jack_id_emb(i),  // pin is connected to this entity...
                     0x01,                    // ...to the first pin
@@ -191,7 +203,7 @@ impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
                 &[
                     MIDI_OUT_JACK_SUBTYPE,
                     EMBEDDED,
-                    self.out_jack_id_emb(i), //id
+                    self.out_jack_id_emb(i), // id
                     0x01,                    // 1 pin
                     self.in_jack_id_ext(i),  // pin is connected to this entity...
                     0x01,                    // ...to the first pin

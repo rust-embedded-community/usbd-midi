@@ -1,3 +1,5 @@
+//! A primitive value with 7-bit length.
+
 use crate::data::byte::from_traits::{FromClamped, FromOverFlow};
 use core::convert::TryFrom;
 
@@ -44,6 +46,8 @@ impl FromClamped<u8> for U7 {
 }
 
 impl U7 {
+    /// Maximum value for the type.
     pub const MAX: U7 = U7(0x7F);
+    /// Minimum value for the type.
     pub const MIN: U7 = U7(0);
 }
