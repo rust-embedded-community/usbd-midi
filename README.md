@@ -10,58 +10,41 @@ This crate requires the use of a HAL that implements the `usb-device` traits.
 
 ### Receive MIDI
 
-Turn on the integrated LED of a STM32 BluePill board as long as C2 is pressed.
+Turn on an LED as long as note C2 is pressed. The example only shows the hardware-independent parts.
 
 ```rust
-fn main() -> ! {
-    let dp = pac::Peripherals::take().unwrap();
+// Prerequisites, must be setup according to the used board.
+let mut led = todo!(); // Must implement `embedded_hal::digital::OutputPin`.
+let usb_bus = todo!(); // Must be of type `usb_device::bus::UsbBusAllocator`.
 
-    let mut rcc = dp.RCC.constrain();
+// Create a MIDI class with 1 input and 1 output jack.
+let mut midi = MidiClass::new(&usb_bus, 1, 1);
 
-    let mut gpioa = dp.GPIOA.split(&mut rcc.apb2);
-    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
+    .product("MIDI Test")
+    .device_class(0)
+    .device_sub_class(0)
+    .build();
 
-    let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
-    led.set_high().unwrap();
+loop {
+    if !usb_dev.poll(&mut [&mut midi]) {
+        continue;
+    }
 
-    let mut usb_dp = gpioa.pa12.into_push_pull_output(&mut gpioa.crh);
+    let mut buffer = [0; 64];
 
-    let usb = Peripheral {
-        usb: dp.USB,
-        pin_dm: gpioa.pa11,
-        pin_dp: usb_dp.into_floating_input(&mut gpioa.crh),
-    };
-
-    let usb_bus = UsbBus::new(usb);
-
-    let mut midi = MidiClass::new(&usb_bus, 1, 1);
-
-    let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
-        .product("MIDI Test")
-        .device_class(0)
-        .device_sub_class(0)
-        .build();
-
-    loop {
-        if !usb_dev.poll(&mut [&mut midi]) {
-            continue;
-        }
-
-        let mut buffer = [0; 64];
-
-        if let Ok(size) = midi.read(&mut buffer) {
-            let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
-            for packet in buffer_reader.into_iter() {
-                if let Ok(packet) = packet {
-                    match packet.message {
-                        Message::NoteOn(Channel1, Note::C2, ..) => {
-                            led.set_low().unwrap();
-                        },
-                        Message::NoteOff(Channel1, Note::C2, ..) => {
-                            led.set_high().unwrap();
-                        },
-                        _ => {}
-                    }
+    if let Ok(size) = midi.read(&mut buffer) {
+        let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
+        for packet in buffer_reader.into_iter() {
+            if let Ok(packet) = packet {
+                match packet.message {
+                    Message::NoteOn(Channel1, Note::C2, ..) => {
+                        led.set_low().unwrap();
+                    },
+                    Message::NoteOff(Channel1, Note::C2, ..) => {
+                        led.set_high().unwrap();
+                    },
+                    _ => {}
                 }
             }
         }
