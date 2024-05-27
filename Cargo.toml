@@ -7,8 +7,9 @@ authors = [
     "Oliver Rockstedt <info@sourcebox.de>",
 ]
 edition = "2018"
-description = "A usb-midi implementation for usb-device"
-homepage = "https://github.com/btrepp/usbd-midi"
+description = "A USB MIDI implementation for usb-device."
+homepage = "https://github.com/rust-embedded-community/usbd-midi"
+repository = "https://github.com/rust-embedded-community/usbd-midi"
 license = "MIT"
 categories = ["no-std", "embedded", "hardware-support"]
 keywords = ["usb", "midi"]
