@@ -83,7 +83,7 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 
 impl UsbMidiEventPacket {
     /// Creates a packet from a MIDI message and returns it.
-    pub fn from_midi(cable: CableNumber, midi: Message) -> UsbMidiEventPacket {
+    pub const fn from_midi(cable: CableNumber, midi: Message) -> UsbMidiEventPacket {
         UsbMidiEventPacket {
             cable_number: cable,
             message: midi,
