@@ -22,7 +22,7 @@ impl<'a> MidiPacketBufferReader<'a> {
     }
 }
 
-impl<'a> Iterator for MidiPacketBufferReader<'a> {
+impl Iterator for MidiPacketBufferReader<'_> {
     type Item = Result<UsbMidiEventPacket, MidiPacketParsingError>;
 
     fn next(&mut self) -> Option<Self::Item> {

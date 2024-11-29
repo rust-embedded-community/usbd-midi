@@ -87,7 +87,7 @@ impl From<Message> for Raw {
     }
 }
 
-impl<'a> TryFrom<&'a [u8]> for Message {
+impl TryFrom<&[u8]> for Message {
     type Error = MidiPacketParsingError;
     fn try_from(data: &[u8]) -> Result<Self, Self::Error> {
         let status_byte = match data.first() {
