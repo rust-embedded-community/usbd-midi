@@ -3,7 +3,7 @@
 use crate::data::byte::u7::U7;
 
 /// Custom type for a control function.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct ControlFunction(pub U7);
 
 /// Control Functions as defined in the MIDI 1.0 Specification.

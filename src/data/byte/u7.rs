@@ -4,7 +4,7 @@ use crate::data::byte::from_traits::{FromClamped, FromOverFlow};
 use core::convert::TryFrom;
 
 /// A primitive value that can be from 0-0x7F
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct U7(pub(crate) u8);
 
 /// Error representing that this value is not a valid u7

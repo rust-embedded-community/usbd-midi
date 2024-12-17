@@ -29,6 +29,7 @@ pub enum CableNumber {
 }
 
 /// Error indicating an invalid cable number.
+#[derive(Debug)]
 pub struct InvalidCableNumber(u8);
 
 impl TryFrom<u8> for CableNumber {

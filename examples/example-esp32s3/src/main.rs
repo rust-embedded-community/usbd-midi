@@ -44,7 +44,12 @@ fn main() -> ! {
                 let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
                 for packet in buffer_reader.into_iter() {
                     if let Ok(packet) = packet {
-                        println!("{:?}", packet);
+                        println!(
+                            "Cable: {:?}, Message: {:?}, Bytes: {:?}",
+                            packet.cable_number(),
+                            packet.message(),
+                            packet.as_message_bytes(),
+                        );
                     }
                 }
             }

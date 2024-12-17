@@ -5,7 +5,7 @@ use crate::data::midi::message::raw::{Payload, Raw};
 use crate::data::midi::message::Message;
 use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
-use core::convert::TryFrom;
+use core::convert::{TryFrom, TryInto};
 
 /// A packet that communicates with the host.
 ///
@@ -13,16 +13,16 @@ use core::convert::TryFrom;
 /// message over the supplied cable number
 #[derive(Debug, Eq, PartialEq)]
 pub struct UsbMidiEventPacket {
-    /// Cable number of the packet.
-    pub cable_number: CableNumber,
+    /// Raw packet data.
+    raw: [u8; 4],
     /// Message payload.
-    pub message: Message,
+    message: Message,
 }
 
 impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
+        let cable_number = U4::from(value.cable_number());
         let message = value.message;
-        let cable_number = U4::from(value.cable_number);
         let index_number = {
             let code_index = CodeIndexNumber::find_from_message(&message);
             U4::from(code_index)
@@ -43,6 +43,8 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
 /// Error variants for parsing the packet.
 #[derive(Debug)]
 pub enum MidiPacketParsingError {
+    /// Invalid packet.
+    InvalidPacket,
     /// Invalid note.
     InvalidNote(u8),
     /// Invalid cable number.
@@ -57,14 +59,8 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
     type Error = MidiPacketParsingError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let raw_cable_number = match value.first() {
-            Some(byte) => *byte >> 4,
-            None => return Err(MidiPacketParsingError::MissingDataPacket),
-        };
-
-        let cable_number = match CableNumber::try_from(raw_cable_number) {
-            Ok(val) => val,
-            _ => return Err(MidiPacketParsingError::InvalidCableNumber(raw_cable_number)),
+        let Ok(data) = value.try_into() else {
+            return Err(MidiPacketParsingError::InvalidPacket);
         };
 
         let message_body = match value.get(1..) {
@@ -74,20 +70,68 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 
         let message = Message::try_from(message_body)?;
 
-        Ok(UsbMidiEventPacket {
-            cable_number,
-            message,
-        })
+        Ok(UsbMidiEventPacket { raw: data, message })
     }
 }
 
 impl UsbMidiEventPacket {
-    /// Creates a packet from a MIDI message and returns it.
-    pub const fn from_midi(cable: CableNumber, midi: Message) -> UsbMidiEventPacket {
-        UsbMidiEventPacket {
-            cable_number: cable,
-            message: midi,
-        }
+    /// Returns the cable number.
+    pub fn cable_number(&self) -> CableNumber {
+        let raw_cable_number = self.raw.first().unwrap() >> 4;
+
+        CableNumber::try_from(raw_cable_number).unwrap()
+    }
+
+    /// Returns the message.
+    pub fn message(&self) -> Message {
+        self.message.clone()
+    }
+
+    /// Returns a slice to the message bytes. The length is dependent on the message type.
+    pub fn as_message_bytes(&self) -> &[u8] {
+        let r = Raw::from(self.message.clone());
+        let length = match r.payload {
+            Payload::Empty => 1,
+            Payload::SingleByte(_) => 2,
+            Payload::DoubleByte(_, _) => 3,
+        };
+
+        &self.raw[1..1 + length]
+    }
+
+    /// Returns a reference to the raw bytes.
+    pub fn as_raw_bytes(&self) -> &[u8] {
+        &self.raw
+    }
+
+    /// Returns the raw bytes as owned array.
+    pub fn to_raw_bytes(&self) -> [u8; 4] {
+        self.raw.clone()
+    }
+
+    /// Creates a packet from a message and returns it.
+    pub fn from_message(cable: CableNumber, message: Message) -> Self {
+        let mut raw = [0; 4];
+        let cin = u8::from(U4::from(CodeIndexNumber::find_from_message(&message)));
+        raw[0] = (cable as u8) << 4 | cin;
+        let r = Raw::from(message.clone());
+        raw[1] = r.status;
+        match r.payload {
+            Payload::Empty => {
+                raw[2] = 0;
+                raw[3] = 0;
+            }
+            Payload::SingleByte(byte) => {
+                raw[2] = byte.0;
+                raw[3] = 0;
+            }
+            Payload::DoubleByte(byte1, byte2) => {
+                raw[2] = byte1.0;
+                raw[3] = byte2.0;
+            }
+        };
+
+        UsbMidiEventPacket { raw, message }
     }
 }
 
@@ -107,7 +151,7 @@ mod tests {
             $(
                 #[test]
                 fn $id() {
-                    let (usb_midi_data_packet,expected) = $value;
+                    let (usb_midi_data_packet, expected) = $value;
                     let message = UsbMidiEventPacket::try_from(&usb_midi_data_packet[..]).unwrap();
                     assert_eq!(expected, message);
                 }
@@ -116,33 +160,12 @@ mod tests {
     }
 
     decode_message_test! {
-        note_on: ([9, 144, 36, 127], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::NoteOn(Channel1, Note::C2, U7(127))
-        }),
-        note_off: ([8, 128, 36, 0], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::NoteOff(Channel1, Note::C2, U7(0))
-        }),
-        polyphonic_aftertouch: ([10, 160, 36, 64], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64))
-        }),
-        program_change: ([28, 192, 127, 0], UsbMidiEventPacket {
-            cable_number: Cable1,
-            message: Message::ProgramChange(Channel1, U7(127))
-        }),
-        channel_aftertouch: ([13, 208, 127, 0], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::ChannelAftertouch(Channel1, U7(127))
-        }),
-        pitch_wheel: ([14, 224, 64, 32], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::PitchWheelChange(Channel1, U7(64), U7(32))
-        }),
-        control_change: ([11, 177, 1, 32], UsbMidiEventPacket {
-            cable_number: Cable0,
-            message: Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32))
-        }),
+        note_on: ([9, 144, 36, 127], UsbMidiEventPacket::from_message(Cable0, Message::NoteOn(Channel1, Note::C2, U7(127)))),
+        note_off: ([8, 128, 36, 0], UsbMidiEventPacket::from_message(Cable0, Message::NoteOff(Channel1, Note::C2, U7(0)))),
+        polyphonic_aftertouch: ([10, 160, 36, 64], UsbMidiEventPacket::from_message(Cable0, Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64)))),
+        program_change: ([28, 192, 127, 0], UsbMidiEventPacket::from_message(Cable1, Message::ProgramChange(Channel1, U7(127)))),
+        channel_aftertouch: ([13, 208, 127, 0], UsbMidiEventPacket::from_message(Cable0, Message::ChannelAftertouch(Channel1, U7(127)))),
+        pitch_wheel: ([14, 224, 64, 32], UsbMidiEventPacket::from_message(Cable0, Message::PitchWheelChange(Channel1, U7(64), U7(32)))),
+        control_change: ([11, 177, 1, 32], UsbMidiEventPacket::from_message(Cable0, Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32)))),
     }
 }
