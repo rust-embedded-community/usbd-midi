@@ -7,6 +7,8 @@ use core::ptr::addr_of_mut;
 
 use esp_backtrace as _;
 use esp_println::println;
+use midi_convert::midi_types::MidiMessage;
+use midi_convert::parse::MidiTryParseSlice;
 use usb_device::prelude::*;
 use usbd_midi::{
     data::usb_midi::midi_packet_reader::MidiPacketBufferReader, midi_device::MidiClass,
@@ -44,12 +46,8 @@ fn main() -> ! {
                 let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
                 for packet in buffer_reader.into_iter() {
                     if let Ok(packet) = packet {
-                        println!(
-                            "Cable: {:?}, Message: {:?}, Bytes: {:?}",
-                            packet.cable_number(),
-                            packet.message(),
-                            packet.as_message_bytes(),
-                        );
+                        let message = MidiMessage::try_parse_slice(packet.as_message_bytes());
+                        println!("Cable: {:?}, Message: {:?}", packet.cable_number(), message);
                     }
                 }
             }
