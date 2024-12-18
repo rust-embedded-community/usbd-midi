@@ -64,7 +64,7 @@ impl<B: UsbBus> MidiClass<'_, B> {
     }
 
     /// Sends a `UsbMidiEventPacket` and returns either the transferred size or an error.
-    pub fn send_message(&mut self, usb_midi: UsbMidiEventPacket) -> Result<usize> {
+    pub fn send_packet(&mut self, usb_midi: UsbMidiEventPacket) -> Result<usize> {
         let bytes: [u8; MIDI_PACKET_SIZE] = usb_midi.into();
         self.standard_bulkin.write(&bytes)
     }
