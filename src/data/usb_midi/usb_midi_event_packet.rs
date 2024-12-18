@@ -1,28 +1,27 @@
 //! Representation of a USB MIDI event packet.
 
+use core::convert::{TryFrom, TryInto};
+
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload, Raw};
 use crate::data::midi::message::Message;
 use crate::data::usb_midi::cable_number::CableNumber;
 use crate::data::usb_midi::code_index_number::CodeIndexNumber;
-use core::convert::{TryFrom, TryInto};
 
 /// A packet that communicates with the host.
 ///
 /// Currently supported is sending the specified normal midi
 /// message over the supplied cable number
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct UsbMidiEventPacket {
     /// Raw packet data.
     raw: [u8; 4],
-    /// Message payload.
-    message: Message,
 }
 
 impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
         let cable_number = U4::from(value.cable_number());
-        let message = value.message;
+        let message = value.message();
         let index_number = {
             let code_index = CodeIndexNumber::find_from_message(&message);
             U4::from(code_index)
@@ -59,18 +58,11 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
     type Error = MidiPacketParsingError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let Ok(data) = value.try_into() else {
+        let Ok(raw) = value.try_into() else {
             return Err(MidiPacketParsingError::InvalidPacket);
         };
 
-        let message_body = match value.get(1..) {
-            Some(bytes) => bytes,
-            None => return Err(MidiPacketParsingError::MissingDataPacket),
-        };
-
-        let message = Message::try_from(message_body)?;
-
-        Ok(UsbMidiEventPacket { raw: data, message })
+        Ok(UsbMidiEventPacket { raw })
     }
 }
 
@@ -84,12 +76,12 @@ impl UsbMidiEventPacket {
 
     /// Returns the message.
     pub fn message(&self) -> Message {
-        self.message.clone()
+        Message::try_from(&self.raw[1..]).unwrap()
     }
 
     /// Returns a slice to the message bytes. The length is dependent on the message type.
     pub fn as_message_bytes(&self) -> &[u8] {
-        let r = Raw::from(self.message.clone());
+        let r = Raw::from(self.message());
         let length = match r.payload {
             Payload::Empty => 1,
             Payload::SingleByte(_) => 2,
@@ -131,7 +123,7 @@ impl UsbMidiEventPacket {
             }
         };
 
-        UsbMidiEventPacket { raw, message }
+        UsbMidiEventPacket { raw }
     }
 }
 

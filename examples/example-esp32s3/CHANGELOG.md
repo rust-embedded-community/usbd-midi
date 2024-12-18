@@ -17,12 +17,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- `UsbMidiEventPacket::message` field is now private, use function instead.
 - Renamed `UsbMidiEventPacket::from_midi` function to `UsbMidiEventPacket::from_message`.
 
 ### Removed
 
 - `UsbMidiEventPacket::cable_number` field, use function instead.
+- `UsbMidiEventPacket::message` field, use function instead.
 
 ## [0.3.0] - 2024-05-27
 
