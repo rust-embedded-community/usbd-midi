@@ -103,11 +103,13 @@ impl UsbMidiEventPacket {
 
     /// Creates a packet from a message and returns it.
     pub fn from_message(cable: CableNumber, message: Message) -> Self {
-        let mut raw = [0; 4];
         let cin = u8::from(U4::from(CodeIndexNumber::find_from_message(&message)));
+
+        let mut raw = [0; 4];
         raw[0] = (cable as u8) << 4 | cin;
         let r = Raw::from(message.clone());
         raw[1] = r.status;
+
         match r.payload {
             Payload::Empty => {
                 raw[2] = 0;
@@ -123,7 +125,17 @@ impl UsbMidiEventPacket {
             }
         };
 
-        UsbMidiEventPacket { raw }
+        Self { raw }
+    }
+
+    /// Creates a packet from a slice of message bytes.
+    pub fn from_message_bytes(
+        cable: CableNumber,
+        bytes: &[u8],
+    ) -> Result<Self, MidiPacketParsingError> {
+        let message = Message::try_from(bytes)?;
+
+        Ok(Self::from_message(cable, message))
     }
 }
 
