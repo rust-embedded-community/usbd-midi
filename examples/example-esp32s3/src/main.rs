@@ -11,13 +11,7 @@ use esp_println::println;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
 use midi_convert::{parse::MidiTryParseSlice, render_slice::MidiRenderSlice};
 use usb_device::prelude::*;
-use usbd_midi::{
-    data::usb_midi::{
-        cable_number::CableNumber, midi_packet_reader::MidiPacketBufferReader,
-        usb_midi_event_packet::UsbMidiEventPacket,
-    },
-    midi_device::MidiClass,
-};
+use usbd_midi::{CableNumber, MidiClass, MidiPacketBufferReader, UsbMidiEventPacket};
 
 static mut EP_MEMORY: [u32; 1024] = [0; 1024];
 
