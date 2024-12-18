@@ -6,24 +6,29 @@
 use core::ptr::addr_of_mut;
 
 use esp_backtrace as _;
+use esp_hal::{clock, gpio, otg_fs, xtensa_lx_rt, Config};
 use esp_println::println;
-use midi_convert::midi_types::MidiMessage;
-use midi_convert::parse::MidiTryParseSlice;
+use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
+use midi_convert::{parse::MidiTryParseSlice, render_slice::MidiRenderSlice};
 use usb_device::prelude::*;
 use usbd_midi::{
-    data::usb_midi::midi_packet_reader::MidiPacketBufferReader, midi_device::MidiClass,
+    data::usb_midi::{
+        cable_number::CableNumber, midi_packet_reader::MidiPacketBufferReader,
+        usb_midi_event_packet::UsbMidiEventPacket,
+    },
+    midi_device::MidiClass,
 };
 
 static mut EP_MEMORY: [u32; 1024] = [0; 1024];
 
-#[esp_hal::xtensa_lx_rt::entry]
+#[xtensa_lx_rt::entry]
 fn main() -> ! {
-    let mut config = esp_hal::Config::default();
-    config.cpu_clock = esp_hal::clock::CpuClock::Clock240MHz;
+    let mut config = Config::default();
+    config.cpu_clock = clock::CpuClock::Clock240MHz;
     let peripherals = esp_hal::init(config);
 
-    let usb_bus_allocator = esp_hal::otg_fs::UsbBus::new(
-        esp_hal::otg_fs::Usb::new(peripherals.USB0, peripherals.GPIO20, peripherals.GPIO19),
+    let usb_bus_allocator = otg_fs::UsbBus::new(
+        otg_fs::Usb::new(peripherals.USB0, peripherals.GPIO20, peripherals.GPIO19),
         unsafe { &mut *addr_of_mut!(EP_MEMORY) },
     );
 
@@ -39,9 +44,14 @@ fn main() -> ! {
         .unwrap()
         .build();
 
+    let button = gpio::Input::new(peripherals.GPIO0, gpio::Pull::Up);
+    let mut last_button_level = button.level();
+
     loop {
         if usb_dev.poll(&mut [&mut midi_class]) {
+            // Receive messages.
             let mut buffer = [0; 64];
+
             if let Ok(size) = midi_class.read(&mut buffer) {
                 let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
                 for packet in buffer_reader.into_iter() {
@@ -51,6 +61,29 @@ fn main() -> ! {
                     }
                 }
             }
+        }
+
+        // Send messages on button press.
+        let button_level = button.level();
+
+        if button_level != last_button_level {
+            last_button_level = button_level;
+
+            let mut bytes = [0; 3];
+
+            let message = if button_level == gpio::Level::Low {
+                MidiMessage::NoteOn(Channel::C1, Note::C3, Value7::from(100))
+            } else {
+                MidiMessage::NoteOff(Channel::C1, Note::C3, Value7::from(0))
+            };
+
+            message.render_slice(&mut bytes);
+
+            let packet =
+                UsbMidiEventPacket::from_message_bytes(CableNumber::Cable0, &bytes).unwrap();
+            let result = midi_class.send_packet(packet);
+
+            println!("Send result {:?}", result);
         }
     }
 }
