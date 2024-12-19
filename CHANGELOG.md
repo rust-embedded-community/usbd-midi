@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `UsbMidiEventPacket::as_message_bytes` function.
 - `UsbMidiEventPacket::as_raw_bytes` function.
 - `UsbMidiEventPacket::to_raw_bytes` function.
-- `UsbMidiEventPacket::from_message_bytes` function.
+- `UsbMidiEventPacket::try_from_message_bytes` function.
 - `TryFrom<&UsbMidiEventPacket>` implementation for `Message` type.
 - `Message::into_packet` function.
 - Re-exports of common items in crate root.

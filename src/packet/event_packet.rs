@@ -97,7 +97,7 @@ impl UsbMidiEventPacket {
     }
 
     /// Creates a packet from a slice of message bytes.
-    pub fn from_message_bytes(
+    pub fn try_from_message_bytes(
         cable: CableNumber,
         bytes: &[u8],
     ) -> Result<Self, MidiPacketParsingError> {

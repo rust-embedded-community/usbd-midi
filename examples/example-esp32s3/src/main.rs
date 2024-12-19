@@ -74,7 +74,7 @@ fn main() -> ! {
             message.render_slice(&mut bytes);
 
             let packet =
-                UsbMidiEventPacket::from_message_bytes(CableNumber::Cable0, &bytes).unwrap();
+                UsbMidiEventPacket::try_from_message_bytes(CableNumber::Cable0, &bytes).unwrap();
             let result = midi_class.send_packet(packet);
 
             println!("Send result {:?}", result);
