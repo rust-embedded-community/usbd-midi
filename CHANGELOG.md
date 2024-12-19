@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Renamed `MidiClass::send_message` function to `MidiClass::send_packet`.
 - Renamed `midi_device` module to `class`.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
+- Renamed `midi_packet_reader` module to `reader`.
 - Moved usb descriptor constants into class module and made them private.
 
 ### Removed
