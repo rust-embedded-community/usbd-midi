@@ -5,14 +5,15 @@ pub mod control_function;
 pub mod notes;
 pub mod raw;
 
+use core::convert::TryFrom;
+
 use crate::data::from_traits::FromClamped;
 use crate::data::u7::U7;
 use crate::message::channel::Channel;
 use crate::message::control_function::ControlFunction;
 use crate::message::notes::Note;
 use crate::message::raw::{Payload, Raw};
-use crate::packet::event_packet::MidiPacketParsingError;
-use core::convert::TryFrom;
+use crate::packet::event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 
 type Velocity = U7;
 
@@ -91,6 +92,7 @@ impl From<Message> for Raw {
 
 impl TryFrom<&[u8]> for Message {
     type Error = MidiPacketParsingError;
+
     fn try_from(data: &[u8]) -> Result<Self, Self::Error> {
         let status_byte = match data.first() {
             Some(byte) => byte,
@@ -132,6 +134,14 @@ impl TryFrom<&[u8]> for Message {
             )),
             _ => Err(MidiPacketParsingError::InvalidEventType(event_type)),
         }
+    }
+}
+
+impl TryFrom<&UsbMidiEventPacket> for Message {
+    type Error = MidiPacketParsingError;
+
+    fn try_from(value: &UsbMidiEventPacket) -> Result<Self, Self::Error> {
+        Self::try_from(&value.as_raw_bytes()[1..])
     }
 }
 
