@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `UsbMidiEventPacket::cable_number` field, use function instead.
 - `UsbMidiEventPacket::message` field, use `Message::try_from(&UsbMidiEventPacket)` instead.
 - `UsbMidiEventPacket::from_midi` function, use `Message::into_packet` instead.
+- `CodeIndexNumber::find_from_message` function, use `Message::code_index_number` instead.
 
 ## [0.3.0] - 2024-05-27
 

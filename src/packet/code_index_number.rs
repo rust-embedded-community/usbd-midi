@@ -1,7 +1,6 @@
 //! Enum representing the code index number of a packet.
 
 use crate::data::u4::U4;
-use crate::message::Message;
 use core::convert::TryFrom;
 
 /// The Code Index Number(CIN) indicates the classification
@@ -65,17 +64,4 @@ impl CodeIndexNumber {
     pub const PITCHBEND_CHANGE: CodeIndexNumber = CodeIndexNumber(0xE);
     /// Single Byte
     pub const SINGLE_BYTE: CodeIndexNumber = CodeIndexNumber(0xF);
-
-    /// Determines the code index number of a message and returns it.
-    pub fn find_from_message(value: &Message) -> CodeIndexNumber {
-        match value {
-            Message::NoteOn(_, _, _) => CodeIndexNumber::NOTE_ON,
-            Message::NoteOff(_, _, _) => CodeIndexNumber::NOTE_OFF,
-            Message::ChannelAftertouch(_, _) => CodeIndexNumber::CHANNEL_PRESSURE,
-            Message::PitchWheelChange(_, _, _) => CodeIndexNumber::PITCHBEND_CHANGE,
-            Message::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::POLY_KEYPRESS,
-            Message::ProgramChange(_, _) => CodeIndexNumber::PROGRAM_CHANGE,
-            Message::ControlChange(_, _, _) => CodeIndexNumber::CONTROL_CHANGE,
-        }
-    }
 }
