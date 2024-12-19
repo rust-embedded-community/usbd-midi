@@ -142,10 +142,10 @@ impl UsbMidiEventPacket {
 #[cfg(test)]
 mod tests {
     use crate::data::byte::u7::U7;
-    use crate::data::midi::channel::Channel::{Channel1, Channel2};
+    use crate::data::midi::message::channel::Channel::{Channel1, Channel2};
     use crate::data::midi::message::control_function::ControlFunction;
+    use crate::data::midi::message::notes::Note;
     use crate::data::midi::message::Message;
-    use crate::data::midi::notes::Note;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
     use crate::packet::event_packet::UsbMidiEventPacket;
     use core::convert::TryFrom;

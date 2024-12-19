@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
 - Renamed `midi_packet_reader` module to `reader`.
 - Renamed `usb_midi_event_packet` module to `event_packet`.
+- Moved `channel` and `notes` modules into `message` module.
 - Moved usb descriptor constants into class module and made them private.
 
 ### Removed
