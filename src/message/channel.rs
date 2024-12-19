@@ -1,7 +1,5 @@
 //! Enum representing the MIDI channel.
 
-use core::convert::TryFrom;
-
 /// The Channel is a value ranging from 0x0 to 0xF.
 ///
 /// This is a standard midi concept.

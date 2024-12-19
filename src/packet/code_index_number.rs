@@ -1,7 +1,5 @@
 //! Enum representing the code index number of a packet.
 
-use core::convert::TryFrom;
-
 use crate::data::u4::U4;
 use crate::packet::event_packet::MidiPacketParsingError;
 

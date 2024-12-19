@@ -1,7 +1,5 @@
 //! A primitive value with 4-bit length.
 
-use core::convert::TryFrom;
-
 /// A primitive value that can be from 0-0x0F
 pub struct U4(u8);
 

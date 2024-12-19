@@ -1,7 +1,6 @@
 //! A primitive value with 7-bit length.
 
 use crate::data::from_traits::{FromClamped, FromOverFlow};
-use core::convert::TryFrom;
 
 /// A primitive value that can be from 0-0x7F
 #[derive(Debug, Clone, Eq, PartialEq)]

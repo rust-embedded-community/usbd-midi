@@ -6,7 +6,7 @@ authors = [
     "Florian Jung <flo@windfis.ch>",
     "Oliver Rockstedt <info@sourcebox.de>",
 ]
-edition = "2018"
+edition = "2021"
 description = "A USB MIDI implementation for usb-device."
 homepage = "https://github.com/rust-embedded-community/usbd-midi"
 repository = "https://github.com/rust-embedded-community/usbd-midi"

@@ -1,7 +1,5 @@
 //! Representation of a USB MIDI event packet.
 
-use core::convert::{TryFrom, TryInto};
-
 use crate::data::u4::U4;
 use crate::message::raw::{Payload, Raw};
 use crate::message::Message;

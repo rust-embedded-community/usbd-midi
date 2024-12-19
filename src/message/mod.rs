@@ -5,8 +5,6 @@ pub mod control_function;
 pub mod notes;
 pub mod raw;
 
-use core::convert::TryFrom;
-
 use crate::data::from_traits::FromClamped;
 use crate::data::u4::U4;
 use crate::data::u7::U7;
@@ -219,7 +217,6 @@ mod tests {
     use crate::message::Message;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
     use crate::packet::event_packet::UsbMidiEventPacket;
-    use core::convert::TryFrom;
 
     macro_rules! decode_message_test {
         ($($id:ident:$value:expr,)*) => {

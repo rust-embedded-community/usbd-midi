@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Set edition to 2021.
 - Renamed `MidiClass::send_message` function to `MidiClass::send_packet`.
 - Renamed `midi_device` module to `class`.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
