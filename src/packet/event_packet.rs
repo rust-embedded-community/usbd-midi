@@ -54,7 +54,8 @@ impl UsbMidiEventPacket {
     pub fn cable_number(&self) -> CableNumber {
         let raw_cable_number = self.raw[0] >> 4;
 
-        CableNumber::try_from(raw_cable_number).unwrap()
+        // Unwrap cannot fail because of limited `raw_cable_number` value range.
+        CableNumber::try_from(raw_cable_number).unwrap_or_default()
     }
 
     /// Returns a slice to the message bytes. The length is dependent on the message type.

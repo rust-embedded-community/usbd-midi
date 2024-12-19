@@ -7,9 +7,10 @@ use crate::packet::event_packet::MidiPacketParsingError;
 /// indicating the number assignment of the Embedded MIDI Jack associated
 /// with the endpoint that is transferring the data
 #[allow(missing_docs)]
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum CableNumber {
+    #[default]
     Cable0 = 0x0,
     Cable1 = 0x1,
     Cable2 = 0x2,
