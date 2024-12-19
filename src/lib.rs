@@ -2,10 +2,10 @@
 
 #![no_std]
 
+pub mod class;
 pub mod data;
-pub mod midi_device;
 
+pub use crate::class::MidiClass;
 pub use crate::data::usb_midi::cable_number::CableNumber;
 pub use crate::data::usb_midi::midi_packet_reader::MidiPacketBufferReader;
 pub use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
-pub use crate::midi_device::MidiClass;

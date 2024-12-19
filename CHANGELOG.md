@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Renamed `UsbMidiEventPacket::from_midi` function to `UsbMidiEventPacket::from_message`.
 - Renamed `MidiClass::send_message` function to `MidiClass::send_packet`.
+- Renamed `midi_device` module to `class`.
 - Moved usb descriptor constants into class module and made them private.
 
 ### Removed
