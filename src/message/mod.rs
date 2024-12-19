@@ -177,13 +177,13 @@ impl Message {
     /// Returns the code index number for a message.
     pub fn code_index_number(&self) -> CodeIndexNumber {
         match self {
-            Self::NoteOn(_, _, _) => CodeIndexNumber::NOTE_ON,
-            Self::NoteOff(_, _, _) => CodeIndexNumber::NOTE_OFF,
-            Self::ChannelAftertouch(_, _) => CodeIndexNumber::CHANNEL_PRESSURE,
-            Self::PitchWheelChange(_, _, _) => CodeIndexNumber::PITCHBEND_CHANGE,
-            Self::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::POLY_KEYPRESS,
-            Self::ProgramChange(_, _) => CodeIndexNumber::PROGRAM_CHANGE,
-            Self::ControlChange(_, _, _) => CodeIndexNumber::CONTROL_CHANGE,
+            Self::NoteOn(_, _, _) => CodeIndexNumber::NoteOn,
+            Self::NoteOff(_, _, _) => CodeIndexNumber::NoteOff,
+            Self::ChannelAftertouch(_, _) => CodeIndexNumber::ChannelPressure,
+            Self::PitchWheelChange(_, _, _) => CodeIndexNumber::PitchBendChange,
+            Self::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::PolyKeyPress,
+            Self::ProgramChange(_, _) => CodeIndexNumber::ProgramChange,
+            Self::ControlChange(_, _, _) => CodeIndexNumber::ControlChange,
         }
     }
 }

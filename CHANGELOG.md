@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Moved `byte` submodules into `data` module.
 - Consolidated separate `InvalidCableNumber` struct into `MidiPacketParsingError`.
 - Consolidated separate `InvalidCodeIndexNumber` struct into `MidiPacketParsingError`.
+- Converted `CodeIndexNumber` struct to enum.
 - Moved descriptor constants into class module and made them private.
 
 ### Removed
