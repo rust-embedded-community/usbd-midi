@@ -89,7 +89,7 @@ impl UsbMidiEventPacket {
 
     /// Returns the raw bytes as owned array.
     pub fn to_raw_bytes(&self) -> [u8; 4] {
-        self.raw.clone()
+        self.raw
     }
 
     /// Creates a packet from a slice of message bytes.
