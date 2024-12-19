@@ -6,7 +6,6 @@ use crate::data::u4::U4;
 use crate::message::raw::{Payload, Raw};
 use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
-use crate::packet::code_index_number::CodeIndexNumber;
 
 /// A packet that communicates with the host.
 ///
@@ -22,10 +21,7 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
         let cable_number = U4::from(value.cable_number());
         let message = Message::try_from(&value).unwrap();
-        let index_number = {
-            let code_index = CodeIndexNumber::find_from_message(&message);
-            U4::from(code_index)
-        };
+        let index_number = { U4::from(message.code_index_number()) };
         let header = U4::combine(cable_number, index_number);
 
         let raw_midi = Raw::from(message);

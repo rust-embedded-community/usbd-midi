@@ -151,7 +151,7 @@ impl TryFrom<&UsbMidiEventPacket> for Message {
 impl Message {
     /// Create a packet from the message.
     pub fn into_packet(self, cable: CableNumber) -> UsbMidiEventPacket {
-        let cin = u8::from(U4::from(CodeIndexNumber::find_from_message(&self)));
+        let cin = u8::from(U4::from(self.code_index_number()));
 
         let mut raw = [0; 4];
         raw[0] = (cable as u8) << 4 | cin;
@@ -174,6 +174,19 @@ impl Message {
         };
 
         UsbMidiEventPacket::try_from(raw.as_slice()).unwrap()
+    }
+
+    /// Returns the code index number for a message.
+    pub fn code_index_number(&self) -> CodeIndexNumber {
+        match self {
+            Self::NoteOn(_, _, _) => CodeIndexNumber::NOTE_ON,
+            Self::NoteOff(_, _, _) => CodeIndexNumber::NOTE_OFF,
+            Self::ChannelAftertouch(_, _) => CodeIndexNumber::CHANNEL_PRESSURE,
+            Self::PitchWheelChange(_, _, _) => CodeIndexNumber::PITCHBEND_CHANGE,
+            Self::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::POLY_KEYPRESS,
+            Self::ProgramChange(_, _) => CodeIndexNumber::PROGRAM_CHANGE,
+            Self::ControlChange(_, _, _) => CodeIndexNumber::CONTROL_CHANGE,
+        }
     }
 }
 
