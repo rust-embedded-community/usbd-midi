@@ -1,6 +1,5 @@
 //! Representation of a USB MIDI event packet.
 
-use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
 
@@ -35,6 +34,10 @@ pub enum MidiPacketParsingError {
     InvalidEventType(u8),
     /// Missing data packet.
     MissingDataPacket,
+    /// Empty event.
+    EmptyEvent,
+    /// Invalid event status.
+    InvalidEventStatus,
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
@@ -45,7 +48,7 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
             return Err(MidiPacketParsingError::InvalidPacket);
         };
 
-        Ok(UsbMidiEventPacket { raw })
+        Ok(Self { raw })
     }
 }
 
@@ -88,8 +91,13 @@ impl UsbMidiEventPacket {
         cable: CableNumber,
         bytes: &[u8],
     ) -> Result<Self, MidiPacketParsingError> {
-        let message = Message::try_from(bytes)?;
+        let cin = CodeIndexNumber::try_from_event(bytes)?;
+        let event_size = cin.event_size();
 
-        Ok(message.into_packet(cable))
+        let mut raw = [0; 4];
+        raw[0] = (cable as u8) << 4 | cin as u8;
+        raw[1..1 + event_size].copy_from_slice(&bytes[..event_size]);
+
+        Ok(Self { raw })
     }
 }

@@ -92,6 +92,34 @@ impl From<CodeIndexNumber> for U4 {
 }
 
 impl CodeIndexNumber {
+    /// Creates a new number from a MIDI event.
+    pub fn try_from_event(event: &[u8]) -> Result<Self, MidiPacketParsingError> {
+        let Some(status) = event.first() else {
+            return Err(MidiPacketParsingError::EmptyEvent);
+        };
+
+        if *status < 0xF0 {
+            match status & 0xF0 {
+                0x80 => Ok(Self::NoteOff),
+                0x90 => Ok(Self::NoteOn),
+                0xA0 => Ok(Self::PolyKeyPress),
+                0xB0 => Ok(Self::ControlChange),
+                0xC0 => Ok(Self::ProgramChange),
+                0xD0 => Ok(Self::ChannelPressure),
+                0xE0 => Ok(Self::PitchBendChange),
+                _ => Err(MidiPacketParsingError::InvalidEventStatus),
+            }
+        } else {
+            match status {
+                0xF1 | 0xF3 => Ok(Self::SystemCommon2Bytes),
+                0xF2 => Ok(Self::SystemCommon3Bytes),
+                0xF6 => Ok(Self::SystemCommon1Byte),
+                0xF8 | 0xFA | 0xFB | 0xFC | 0xFE | 0xFF => Ok(Self::SingleByte),
+                _ => Err(MidiPacketParsingError::InvalidEventStatus),
+            }
+        }
+    }
+
     /// Returns the size of the MIDI_x event in bytes.
     pub fn event_size(&self) -> usize {
         match self {
