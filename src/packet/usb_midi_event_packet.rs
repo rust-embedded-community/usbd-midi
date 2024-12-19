@@ -5,8 +5,8 @@ use core::convert::{TryFrom, TryInto};
 use crate::data::byte::u4::U4;
 use crate::data::midi::message::raw::{Payload, Raw};
 use crate::data::midi::message::Message;
-use crate::data::packet::cable_number::CableNumber;
-use crate::data::packet::code_index_number::CodeIndexNumber;
+use crate::packet::cable_number::CableNumber;
+use crate::packet::code_index_number::CodeIndexNumber;
 
 /// A packet that communicates with the host.
 ///
@@ -146,8 +146,8 @@ mod tests {
     use crate::data::midi::message::control_function::ControlFunction;
     use crate::data::midi::message::Message;
     use crate::data::midi::notes::Note;
-    use crate::data::packet::cable_number::CableNumber::{Cable0, Cable1};
-    use crate::data::packet::usb_midi_event_packet::UsbMidiEventPacket;
+    use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
+    use crate::packet::usb_midi_event_packet::UsbMidiEventPacket;
     use core::convert::TryFrom;
 
     macro_rules! decode_message_test {

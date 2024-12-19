@@ -9,7 +9,7 @@ use crate::data::midi::channel::Channel;
 use crate::data::midi::message::control_function::ControlFunction;
 use crate::data::midi::message::raw::{Payload, Raw};
 use crate::data::midi::notes::Note;
-use crate::data::packet::usb_midi_event_packet::MidiPacketParsingError;
+use crate::packet::usb_midi_event_packet::MidiPacketParsingError;
 use core::convert::TryFrom;
 
 type Velocity = U7;

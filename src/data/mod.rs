@@ -2,4 +2,3 @@
 
 pub mod byte;
 pub mod midi;
-pub mod packet;
