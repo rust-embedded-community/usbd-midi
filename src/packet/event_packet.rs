@@ -147,7 +147,7 @@ mod tests {
     use crate::data::midi::message::Message;
     use crate::data::midi::notes::Note;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
-    use crate::packet::usb_midi_event_packet::UsbMidiEventPacket;
+    use crate::packet::event_packet::UsbMidiEventPacket;
     use core::convert::TryFrom;
 
     macro_rules! decode_message_test {
