@@ -44,6 +44,8 @@ pub enum MidiPacketParsingError {
     InvalidNote(u8),
     /// Invalid cable number.
     InvalidCableNumber(u8),
+    /// Invalid code index number.
+    InvalidCodeIndexNumber(u8),
     /// Invalid event type.
     InvalidEventType(u8),
     /// Missing data packet.

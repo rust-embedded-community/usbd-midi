@@ -29,7 +29,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
 - Moved `byte` submodules into `data` module.
-- Moved usb descriptor constants into class module and made them private.
+- Consolidated separate `InvalidCableNumber` struct into `MidiPacketParsingError`.
+- Consolidated separate `InvalidCodeIndexNumber` struct into `MidiPacketParsingError`.
+- Moved descriptor constants into class module and made them private.
 
 ### Removed
 

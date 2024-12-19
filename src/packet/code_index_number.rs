@@ -1,20 +1,20 @@
 //! Enum representing the code index number of a packet.
 
-use crate::data::u4::U4;
 use core::convert::TryFrom;
+
+use crate::data::u4::U4;
+use crate::packet::event_packet::MidiPacketParsingError;
 
 /// The Code Index Number(CIN) indicates the classification
 /// of the bytes in the MIDI_x fields
 pub struct CodeIndexNumber(u8);
 
-/// Error indicating an invalid code index number.
-pub struct InvalidCodeIndexNumber(u8);
-
 impl TryFrom<u8> for CodeIndexNumber {
-    type Error = InvalidCodeIndexNumber;
+    type Error = MidiPacketParsingError;
+
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         if value > 0xF {
-            Err(InvalidCodeIndexNumber(value))
+            Err(MidiPacketParsingError::InvalidCodeIndexNumber(value))
         } else {
             Ok(CodeIndexNumber(value))
         }
