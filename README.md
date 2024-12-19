@@ -15,11 +15,10 @@ Turn on an LED as long as note C2 is pressed. The example only shows the hardwar
 ```rust
 use usb_device::prelude::*;
 use usbd_midi::{
-    data::{
-        midi::{channel::Channel, message::Message, notes::Note},
-        usb_midi::midi_packet_reader::MidiPacketBufferReader,
-    },
-    midi_device::MidiClass,
+    message::{channel::Channel, notes::Note},
+    Message,
+    MidiClass,
+    MidiPacketBufferReader,
 };
 
 // Prerequisites, must be setup according to the used board.
@@ -29,15 +28,15 @@ let usb_bus = todo!(); // Must be of type `usb_device::bus::UsbBusAllocator`.
 // Create a MIDI class with 1 input and 1 output jack.
 let mut midi = MidiClass::new(&usb_bus, 1, 1).unwrap();
 
-    let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
-        .device_class(0)
-        .device_sub_class(0)
-        .strings(&[StringDescriptors::default()
-            .manufacturer("Music Company")
-            .product("MIDI Device")
-            .serial_number("12345678")])
-        .unwrap()
-        .build();
+let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
+    .device_class(0)
+    .device_sub_class(0)
+    .strings(&[StringDescriptors::default()
+        .manufacturer("Music Company")
+        .product("MIDI Device")
+        .serial_number("12345678")])
+    .unwrap()
+    .build();
 
 loop {
     if !usb_dev.poll(&mut [&mut midi]) {
