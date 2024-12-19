@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `TryFrom<&UsbMidiEventPacket>` implementation for `Message` type.
 - `Message::into_packet` function.
 - `Message::code_index_number` function.
+- `CodeIndexNumber::event_size()` function.
 - Re-exports of common items in crate root.
 
 ### Changed

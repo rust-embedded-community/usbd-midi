@@ -90,3 +90,28 @@ impl From<CodeIndexNumber> for U4 {
         U4::from_overflowing_u8(value as u8)
     }
 }
+
+impl CodeIndexNumber {
+    /// Returns the size of the MIDI_x event in bytes.
+    pub fn event_size(&self) -> usize {
+        match self {
+            Self::SystemCommon1Byte | Self::SingleByte => 1,
+            Self::SystemCommon2Bytes
+            | Self::SysexEnds2Bytes
+            | Self::ProgramChange
+            | Self::ChannelPressure => 2,
+            Self::SystemCommon3Bytes
+            | Self::SysexEnds3Bytes
+            | Self::SysexStartsOrContinues
+            | Self::NoteOff
+            | Self::NoteOn
+            | Self::PolyKeyPress
+            | Self::ControlChange
+            | Self::PitchBendChange => 3,
+
+            // These variants are reserved for future use.
+            // We assume the maximum length of 3 bytes so that no data can get lost.
+            Self::MiscFunction | Self::CableEvents => 3,
+        }
+    }
+}

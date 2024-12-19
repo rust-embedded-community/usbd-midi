@@ -4,6 +4,7 @@ use crate::data::u4::U4;
 use crate::message::raw::{Payload, Raw};
 use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
+use crate::packet::code_index_number::CodeIndexNumber;
 
 /// A packet that communicates with the host.
 ///
@@ -65,21 +66,17 @@ impl TryFrom<&[u8]> for UsbMidiEventPacket {
 impl UsbMidiEventPacket {
     /// Returns the cable number.
     pub fn cable_number(&self) -> CableNumber {
-        let raw_cable_number = self.raw.first().unwrap() >> 4;
+        let raw_cable_number = self.raw[0] >> 4;
 
         CableNumber::try_from(raw_cable_number).unwrap()
     }
 
     /// Returns a slice to the message bytes. The length is dependent on the message type.
     pub fn as_message_bytes(&self) -> &[u8] {
-        let r = Raw::from(Message::try_from(self).unwrap());
-        let length = match r.payload {
-            Payload::Empty => 1,
-            Payload::SingleByte(_) => 2,
-            Payload::DoubleByte(_, _) => 3,
-        };
+        let cin = CodeIndexNumber::try_from(self.raw[0] & 0x0F).unwrap();
+        let size = cin.event_size();
 
-        &self.raw[1..1 + length]
+        &self.raw[1..1 + size]
     }
 
     /// Returns a reference to the raw bytes.
