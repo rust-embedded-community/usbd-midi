@@ -101,11 +101,6 @@ impl UsbMidiEventPacket {
         self.raw.clone()
     }
 
-    /// Creates a packet from a message and returns it.
-    pub fn from_message(cable: CableNumber, message: Message) -> Self {
-        message.into_packet(cable)
-    }
-
     /// Creates a packet from a slice of message bytes.
     pub fn from_message_bytes(
         cable: CableNumber,
@@ -113,6 +108,6 @@ impl UsbMidiEventPacket {
     ) -> Result<Self, MidiPacketParsingError> {
         let message = Message::try_from(bytes)?;
 
-        Ok(Self::from_message(cable, message))
+        Ok(message.into_packet(cable))
     }
 }
