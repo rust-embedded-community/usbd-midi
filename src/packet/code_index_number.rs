@@ -1,6 +1,6 @@
 //! Enum representing the code index number of a packet.
 
-use crate::data::byte::u4::U4;
+use crate::data::u4::U4;
 use crate::message::Message;
 use core::convert::TryFrom;
 

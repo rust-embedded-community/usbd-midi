@@ -2,7 +2,7 @@
 
 use core::convert::{TryFrom, TryInto};
 
-use crate::data::byte::u4::U4;
+use crate::data::u4::U4;
 use crate::message::raw::{Payload, Raw};
 use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
@@ -141,7 +141,7 @@ impl UsbMidiEventPacket {
 
 #[cfg(test)]
 mod tests {
-    use crate::data::byte::u7::U7;
+    use crate::data::u7::U7;
     use crate::message::channel::Channel::{Channel1, Channel2};
     use crate::message::control_function::ControlFunction;
     use crate::message::notes::Note;

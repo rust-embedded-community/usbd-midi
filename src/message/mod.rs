@@ -5,8 +5,8 @@ pub mod control_function;
 pub mod notes;
 pub mod raw;
 
-use crate::data::byte::from_traits::FromClamped;
-use crate::data::byte::u7::U7;
+use crate::data::from_traits::FromClamped;
+use crate::data::u7::U7;
 use crate::message::channel::Channel;
 use crate::message::control_function::ControlFunction;
 use crate::message::notes::Note;
