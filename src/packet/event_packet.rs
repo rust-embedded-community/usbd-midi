@@ -1,7 +1,5 @@
 //! Representation of a USB MIDI event packet.
 
-use crate::data::u4::U4;
-use crate::message::raw::{Payload, Raw};
 use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
@@ -18,19 +16,7 @@ pub struct UsbMidiEventPacket {
 
 impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
-        let cable_number = U4::from(value.cable_number());
-        let message = Message::try_from(&value).unwrap();
-        let index_number = { U4::from(message.code_index_number()) };
-        let header = U4::combine(cable_number, index_number);
-
-        let raw_midi = Raw::from(message);
-        let status = raw_midi.status;
-
-        match raw_midi.payload {
-            Payload::Empty => [header, status, 0, 0],
-            Payload::SingleByte(byte) => [header, status, byte.into(), 0],
-            Payload::DoubleByte(byte1, byte2) => [header, status, byte1.into(), byte2.into()],
-        }
+        value.raw
     }
 }
 
