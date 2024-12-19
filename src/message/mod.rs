@@ -7,10 +7,10 @@ pub mod raw;
 
 use crate::data::byte::from_traits::FromClamped;
 use crate::data::byte::u7::U7;
-use crate::data::midi::message::channel::Channel;
-use crate::data::midi::message::control_function::ControlFunction;
-use crate::data::midi::message::notes::Note;
-use crate::data::midi::message::raw::{Payload, Raw};
+use crate::message::channel::Channel;
+use crate::message::control_function::ControlFunction;
+use crate::message::notes::Note;
+use crate::message::raw::{Payload, Raw};
 use crate::packet::event_packet::MidiPacketParsingError;
 use core::convert::TryFrom;
 

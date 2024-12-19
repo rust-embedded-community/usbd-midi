@@ -1,7 +1,7 @@
 //! Enum representing the code index number of a packet.
 
 use crate::data::byte::u4::U4;
-use crate::data::midi::message::Message;
+use crate::message::Message;
 use core::convert::TryFrom;
 
 /// The Code Index Number(CIN) indicates the classification

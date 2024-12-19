@@ -3,8 +3,8 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::data::byte::u4::U4;
-use crate::data::midi::message::raw::{Payload, Raw};
-use crate::data::midi::message::Message;
+use crate::message::raw::{Payload, Raw};
+use crate::message::Message;
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
 
@@ -142,10 +142,10 @@ impl UsbMidiEventPacket {
 #[cfg(test)]
 mod tests {
     use crate::data::byte::u7::U7;
-    use crate::data::midi::message::channel::Channel::{Channel1, Channel2};
-    use crate::data::midi::message::control_function::ControlFunction;
-    use crate::data::midi::message::notes::Note;
-    use crate::data::midi::message::Message;
+    use crate::message::channel::Channel::{Channel1, Channel2};
+    use crate::message::control_function::ControlFunction;
+    use crate::message::notes::Note;
+    use crate::message::Message;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
     use crate::packet::event_packet::UsbMidiEventPacket;
     use core::convert::TryFrom;
