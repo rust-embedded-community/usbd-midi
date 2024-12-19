@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+**NOTE:** The `message` module containing the `Message` struct and related types is now gated behind the `message-types` feature. This feature is enabled by default.
+
 ### Added
 
 - `UsbMidiEventPacket::cable_number` function.

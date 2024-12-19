@@ -14,6 +14,10 @@ license = "MIT"
 categories = ["no-std", "embedded", "hardware-support"]
 keywords = ["usb", "midi"]
 
+[features]
+default = ["message-types"]
+message-types = []
+
 [dependencies]
 usb-device = "0.3"
 
