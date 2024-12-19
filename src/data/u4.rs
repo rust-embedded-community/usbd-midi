@@ -6,7 +6,7 @@ use core::convert::TryFrom;
 pub struct U4(u8);
 
 /// Error representing that this value is not a valid u4
-pub struct InvalidU4(u8);
+pub struct InvalidU4(pub u8);
 
 impl TryFrom<u8> for U4 {
     type Error = InvalidU4;

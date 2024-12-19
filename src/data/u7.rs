@@ -8,7 +8,7 @@ use core::convert::TryFrom;
 pub struct U7(pub(crate) u8);
 
 /// Error representing that this value is not a valid u7
-pub struct InvalidU7(u8);
+pub struct InvalidU7(pub u8);
 
 impl TryFrom<u8> for U7 {
     type Error = InvalidU7;
