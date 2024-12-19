@@ -8,11 +8,14 @@ pub mod raw;
 use core::convert::TryFrom;
 
 use crate::data::from_traits::FromClamped;
+use crate::data::u4::U4;
 use crate::data::u7::U7;
 use crate::message::channel::Channel;
 use crate::message::control_function::ControlFunction;
 use crate::message::notes::Note;
 use crate::message::raw::{Payload, Raw};
+use crate::packet::cable_number::CableNumber;
+use crate::packet::code_index_number::CodeIndexNumber;
 use crate::packet::event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 
 type Velocity = U7;
@@ -142,6 +145,35 @@ impl TryFrom<&UsbMidiEventPacket> for Message {
 
     fn try_from(value: &UsbMidiEventPacket) -> Result<Self, Self::Error> {
         Self::try_from(&value.as_raw_bytes()[1..])
+    }
+}
+
+impl Message {
+    /// Create a packet from the message.
+    pub fn into_packet(self, cable: CableNumber) -> UsbMidiEventPacket {
+        let cin = u8::from(U4::from(CodeIndexNumber::find_from_message(&self)));
+
+        let mut raw = [0; 4];
+        raw[0] = (cable as u8) << 4 | cin;
+        let r = Raw::from(self);
+        raw[1] = r.status;
+
+        match r.payload {
+            Payload::Empty => {
+                raw[2] = 0;
+                raw[3] = 0;
+            }
+            Payload::SingleByte(byte) => {
+                raw[2] = byte.0;
+                raw[3] = 0;
+            }
+            Payload::DoubleByte(byte1, byte2) => {
+                raw[2] = byte1.0;
+                raw[3] = byte2.0;
+            }
+        };
+
+        UsbMidiEventPacket::try_from(raw.as_slice()).unwrap()
     }
 }
 
