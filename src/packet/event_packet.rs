@@ -21,7 +21,7 @@ pub struct UsbMidiEventPacket {
 impl From<UsbMidiEventPacket> for [u8; 4] {
     fn from(value: UsbMidiEventPacket) -> [u8; 4] {
         let cable_number = U4::from(value.cable_number());
-        let message = value.message();
+        let message = Message::try_from(&value).unwrap();
         let index_number = {
             let code_index = CodeIndexNumber::find_from_message(&message);
             U4::from(code_index)
@@ -74,14 +74,9 @@ impl UsbMidiEventPacket {
         CableNumber::try_from(raw_cable_number).unwrap()
     }
 
-    /// Returns the message.
-    pub fn message(&self) -> Message {
-        Message::try_from(&self.raw[1..]).unwrap()
-    }
-
     /// Returns a slice to the message bytes. The length is dependent on the message type.
     pub fn as_message_bytes(&self) -> &[u8] {
-        let r = Raw::from(self.message());
+        let r = Raw::from(Message::try_from(self).unwrap());
         let length = match r.payload {
             Payload::Empty => 1,
             Payload::SingleByte(_) => 2,

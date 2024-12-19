@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - `UsbMidiEventPacket::cable_number` function.
-- `UsbMidiEventPacket::message` function.
 - `UsbMidiEventPacket::as_message_bytes` function.
 - `UsbMidiEventPacket::as_raw_bytes` function.
 - `UsbMidiEventPacket::to_raw_bytes` function.
@@ -34,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 
 - `UsbMidiEventPacket::cable_number` field, use function instead.
-- `UsbMidiEventPacket::message` field, use function instead.
+- `UsbMidiEventPacket::message` field, use `Message::try_from(&UsbMidiEventPacket)` instead.
 - `UsbMidiEventPacket::from_midi` function, use `Message::into_packet` instead.
 
 ## [0.3.0] - 2024-05-27
