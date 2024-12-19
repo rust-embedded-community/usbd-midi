@@ -2,4 +2,4 @@
 
 pub mod byte;
 pub mod midi;
-pub mod usb_midi;
+pub mod packet;

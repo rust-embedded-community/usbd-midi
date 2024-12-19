@@ -6,6 +6,6 @@ pub mod class;
 pub mod data;
 
 pub use crate::class::MidiClass;
-pub use crate::data::usb_midi::cable_number::CableNumber;
-pub use crate::data::usb_midi::midi_packet_reader::MidiPacketBufferReader;
-pub use crate::data::usb_midi::usb_midi_event_packet::UsbMidiEventPacket;
+pub use crate::data::packet::cable_number::CableNumber;
+pub use crate::data::packet::midi_packet_reader::MidiPacketBufferReader;
+pub use crate::data::packet::usb_midi_event_packet::UsbMidiEventPacket;

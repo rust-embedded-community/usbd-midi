@@ -1,6 +1,6 @@
 //! Contains the class implementation.
 
-use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::data::packet::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 use usb_device::class_prelude::*;
 use usb_device::Result;
 

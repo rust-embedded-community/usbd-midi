@@ -1,7 +1,7 @@
 //! Reader for received packets.
 
 use crate::class::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
-use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::data::packet::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 use core::convert::TryFrom;
 
 /// Packet reader with internal buffer for received message.
