@@ -196,3 +196,38 @@ fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, MidiPacketParsi
         None => Err(MidiPacketParsingError::MissingDataPacket),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::data::u7::U7;
+    use crate::message::channel::Channel::{Channel1, Channel2};
+    use crate::message::control_function::ControlFunction;
+    use crate::message::notes::Note;
+    use crate::message::Message;
+    use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
+    use crate::packet::event_packet::UsbMidiEventPacket;
+    use core::convert::TryFrom;
+
+    macro_rules! decode_message_test {
+        ($($id:ident:$value:expr,)*) => {
+            $(
+                #[test]
+                fn $id() {
+                    let (usb_midi_data_packet, expected) = $value;
+                    let message = UsbMidiEventPacket::try_from(&usb_midi_data_packet[..]).unwrap();
+                    assert_eq!(expected, message);
+                }
+            )*
+        }
+    }
+
+    decode_message_test! {
+        note_on: ([9, 144, 36, 127], Message::NoteOn(Channel1, Note::C2, U7(127)).into_packet(Cable0)),
+        note_off: ([8, 128, 36, 0], Message::NoteOff(Channel1, Note::C2, U7(0)).into_packet(Cable0)),
+        polyphonic_aftertouch: ([10, 160, 36, 64], Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64)).into_packet(Cable0)),
+        program_change: ([28, 192, 127, 0], Message::ProgramChange(Channel1, U7(127)).into_packet(Cable1)),
+        channel_aftertouch: ([13, 208, 127, 0], Message::ChannelAftertouch(Channel1, U7(127)).into_packet(Cable0)),
+        pitch_wheel: ([14, 224, 64, 32], Message::PitchWheelChange(Channel1, U7(64), U7(32)).into_packet(Cable0)),
+        control_change: ([11, 177, 1, 32], Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32)).into_packet(Cable0)),
+    }
+}
