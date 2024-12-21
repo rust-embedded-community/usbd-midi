@@ -1,6 +1,6 @@
 //! A primitive value with 4-bit length.
 
-use crate::data::{FromClamped, FromOverFlow};
+use crate::message::data::{FromClamped, FromOverFlow};
 
 /// A primitive value that can be from 0-0x0F
 pub struct U4(u8);

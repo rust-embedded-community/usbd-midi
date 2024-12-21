@@ -2,13 +2,14 @@
 
 pub mod channel;
 pub mod control_function;
+pub mod data;
 pub mod notes;
 pub mod raw;
 
-use crate::data::u7::U7;
-use crate::data::FromClamped;
 use crate::message::channel::Channel;
 use crate::message::control_function::ControlFunction;
+use crate::message::data::u7::U7;
+use crate::message::data::FromClamped;
 use crate::message::notes::Note;
 use crate::message::raw::{Payload, Raw};
 use crate::packet::cable_number::CableNumber;
@@ -209,9 +210,9 @@ fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, MidiPacketParsi
 
 #[cfg(test)]
 mod tests {
-    use crate::data::u7::U7;
     use crate::message::channel::Channel::{Channel1, Channel2};
     use crate::message::control_function::ControlFunction;
+    use crate::message::data::u7::U7;
     use crate::message::notes::Note;
     use crate::message::Message;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};

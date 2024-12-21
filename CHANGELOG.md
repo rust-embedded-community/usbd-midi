@@ -42,8 +42,8 @@ This release focuses on:
 - Moved `usb_midi_event_packet` code into parent `packet` module.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
-- Moved `byte` submodules into `data` module.
-- Moved `from_traits` code into parent module.
+- Moved `byte` submodules into `message::data` module.
+- Moved `from_traits` code into parent `data` module.
 - Consolidated separate `InvalidCableNumber` struct into `MidiPacketParsingError`.
 - Consolidated separate `InvalidCodeIndexNumber` struct into `MidiPacketParsingError`.
 - Converted `CodeIndexNumber` struct to enum.

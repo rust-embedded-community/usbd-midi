@@ -1,6 +1,6 @@
 //! Control function definitions.
 
-use crate::data::u7::U7;
+use crate::message::data::u7::U7;
 
 /// Custom type for a control function.
 #[derive(Debug, Clone, Eq, PartialEq)]

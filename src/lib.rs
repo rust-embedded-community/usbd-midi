@@ -3,7 +3,6 @@
 #![no_std]
 
 pub mod class;
-pub mod data;
 pub mod packet;
 
 #[cfg(feature = "message-types")]

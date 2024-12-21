@@ -1,6 +1,6 @@
 //! Type for the raw MIDI message.
 
-use crate::data::u7::U7;
+use crate::message::data::u7::U7;
 
 /// Represents the payloads that the midi message may contain.
 pub enum Payload {
