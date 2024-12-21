@@ -49,7 +49,7 @@ loop {
         let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
         for packet in buffer_reader.into_iter() {
             if let Ok(packet) = packet {
-                match packet.message {
+                match Message::try_from(&packet).unwrap() {
                     Message::NoteOn(Channel1, Note::C2, ..) => {
                         led.set_low().unwrap();
                     },
