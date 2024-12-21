@@ -1,8 +1,9 @@
 //! Contains the class implementation.
 
-use crate::packet::event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
 use usb_device::class_prelude::*;
 use usb_device::Result;
+
+use crate::packet::{MidiPacketParsingError, UsbMidiEventPacket};
 
 // Constants for use in descriptors.
 const USB_AUDIO_CLASS: u8 = 0x01;

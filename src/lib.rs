@@ -11,8 +11,8 @@ pub mod message;
 
 pub use crate::class::MidiClass;
 pub use crate::packet::cable_number::CableNumber;
-pub use crate::packet::event_packet::UsbMidiEventPacket;
 pub use crate::packet::reader::MidiPacketBufferReader;
+pub use crate::packet::UsbMidiEventPacket;
 
 #[cfg(feature = "message-types")]
 pub use crate::message::Message;

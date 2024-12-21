@@ -1,7 +1,7 @@
 //! Enum representing the code index number of a packet.
 
 use crate::data::u4::U4;
-use crate::packet::event_packet::MidiPacketParsingError;
+use crate::packet::MidiPacketParsingError;
 
 /// The Code Index Number(CIN) indicates the classification
 /// of the bytes in the MIDI_x fields.

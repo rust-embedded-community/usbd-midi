@@ -1,7 +1,7 @@
 //! Enum representing the cable number of a packet.
 
 use crate::data::u4::U4;
-use crate::packet::event_packet::MidiPacketParsingError;
+use crate::packet::MidiPacketParsingError;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF
 /// indicating the number assignment of the Embedded MIDI Jack associated

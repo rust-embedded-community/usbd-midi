@@ -14,7 +14,7 @@ use crate::message::notes::Note;
 use crate::message::raw::{Payload, Raw};
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
-use crate::packet::event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::packet::{MidiPacketParsingError, UsbMidiEventPacket};
 
 type Velocity = U7;
 
@@ -216,7 +216,7 @@ mod tests {
     use crate::message::notes::Note;
     use crate::message::Message;
     use crate::packet::cable_number::CableNumber::{Cable0, Cable1};
-    use crate::packet::event_packet::UsbMidiEventPacket;
+    use crate::packet::UsbMidiEventPacket;
 
     macro_rules! decode_message_test {
         ($($id:ident:$value:expr,)*) => {
