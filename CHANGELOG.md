@@ -31,10 +31,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Renamed `midi_device` module to `class`.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
 - Renamed `midi_packet_reader` module to `reader`.
-- Moved `usb_midi_event_packet` code into new `packet` module.
+- Moved `usb_midi_event_packet` code into parent `packet` module.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
 - Moved `byte` submodules into `data` module.
+- Moved `from_traits` code into parent module.
 - Consolidated separate `InvalidCableNumber` struct into `MidiPacketParsingError`.
 - Consolidated separate `InvalidCodeIndexNumber` struct into `MidiPacketParsingError`.
 - Converted `CodeIndexNumber` struct to enum.
