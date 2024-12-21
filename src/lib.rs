@@ -1,5 +1,4 @@
-//! USB MIDI class implementation for [usb-device](https://crates.io/crates/usb-device).
-
+#![doc = include_str!("../README.md")]
 #![no_std]
 
 pub mod class;

@@ -12,7 +12,7 @@ This crate requires the use of a HAL that implements the `usb-device` traits.
 
 Turn on an LED as long as note C2 is pressed. The example only shows the hardware-independent parts.
 
-```rust
+```rust ignore
 use usb_device::prelude::*;
 use usbd_midi::{
     message::{channel::Channel, notes::Note},
@@ -72,7 +72,7 @@ the `usb-device` crate:
 
 Cargo.toml:
 
-```
+```ignore
 usb-device = { version = ">=0.3.2", features = ["control-buffer-256"] }
 ```
 
