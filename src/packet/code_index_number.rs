@@ -1,6 +1,5 @@
 //! Enum representing the code index number of a packet.
 
-use crate::data::u4::U4;
 use crate::packet::MidiPacketParsingError;
 
 /// The Code Index Number(CIN) indicates the classification
@@ -82,12 +81,6 @@ impl TryFrom<u8> for CodeIndexNumber {
             x if x == CodeIndexNumber::SingleByte as u8 => Ok(CodeIndexNumber::SingleByte),
             _ => Err(MidiPacketParsingError::InvalidCodeIndexNumber(value)),
         }
-    }
-}
-
-impl From<CodeIndexNumber> for U4 {
-    fn from(value: CodeIndexNumber) -> U4 {
-        U4::from_overflowing_u8(value as u8)
     }
 }
 

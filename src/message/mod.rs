@@ -5,7 +5,6 @@ pub mod control_function;
 pub mod notes;
 pub mod raw;
 
-use crate::data::u4::U4;
 use crate::data::u7::U7;
 use crate::data::FromClamped;
 use crate::message::channel::Channel;
@@ -149,7 +148,7 @@ impl TryFrom<&UsbMidiEventPacket> for Message {
 impl Message {
     /// Create a packet from the message.
     pub fn into_packet(self, cable: CableNumber) -> UsbMidiEventPacket {
-        let cin = u8::from(U4::from(self.code_index_number()));
+        let cin = self.code_index_number() as u8;
 
         let mut raw = [0; 4];
         raw[0] = (cable as u8) << 4 | cin;

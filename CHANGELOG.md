@@ -56,6 +56,7 @@ This release focuses on:
 - `UsbMidiEventPacket::from_midi` function, use `Message::into_packet` instead.
 - `CodeIndexNumber::find_from_message` function, use `Message::code_index_number` instead.
 - `From<CableNumber> for U4` implementation.
+- `From<CodeIndexNumber> for U4` implementation.
 
 ## [0.3.0] - 2024-05-27
 
