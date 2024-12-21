@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - `UsbMidiEventPacket::cable_number` function.
+- `UsbMidiEventPacket::header` function.
 - `UsbMidiEventPacket::payload_bytes` function.
 - `UsbMidiEventPacket::as_raw_bytes` function.
 - `UsbMidiEventPacket::to_raw_bytes` function.

@@ -67,6 +67,11 @@ impl UsbMidiEventPacket {
         CableNumber::try_from(raw_cable_number).unwrap_or_default()
     }
 
+    /// Returns the header byte.
+    pub fn header(&self) -> u8 {
+        self.raw[0]
+    }
+
     /// Returns a slice to the event payload bytes. The length is dependent on the payload type.
     pub fn payload_bytes(&self) -> &[u8] {
         let raw_cin = self.raw[0] & 0x0F;
