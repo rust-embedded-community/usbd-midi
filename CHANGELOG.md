@@ -12,15 +12,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - `UsbMidiEventPacket::cable_number` function.
-- `UsbMidiEventPacket::as_message_bytes` function.
+- `UsbMidiEventPacket::payload_bytes` function.
 - `UsbMidiEventPacket::as_raw_bytes` function.
 - `UsbMidiEventPacket::to_raw_bytes` function.
-- `UsbMidiEventPacket::try_from_message_bytes` function.
+- `UsbMidiEventPacket::try_from_payload_bytes` function.
 - `TryFrom<&UsbMidiEventPacket>` implementation for `Message` type.
 - `Message::into_packet` function.
 - `Message::code_index_number` function.
-- `CodeIndexNumber::try_from_event` function.
-- `CodeIndexNumber::event_size` function.
+- `CodeIndexNumber::try_from_payload` function.
+- `CodeIndexNumber::payload_size` function.
 - `CableNumber::Cable0` as default value.
 - `FromOverFlow<u8> for U4` implementation.
 - `FromClamped<u8> for U4` implementation.

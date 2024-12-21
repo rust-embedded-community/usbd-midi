@@ -50,7 +50,7 @@ fn main() -> ! {
                 let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
                 for packet in buffer_reader.into_iter() {
                     if let Ok(packet) = packet {
-                        let message = MidiMessage::try_parse_slice(packet.as_message_bytes());
+                        let message = MidiMessage::try_parse_slice(packet.payload_bytes());
                         println!("Cable: {:?}, Message: {:?}", packet.cable_number(), message);
                     }
                 }
@@ -74,7 +74,7 @@ fn main() -> ! {
             message.render_slice(&mut bytes);
 
             let packet =
-                UsbMidiEventPacket::try_from_message_bytes(CableNumber::Cable0, &bytes).unwrap();
+                UsbMidiEventPacket::try_from_payload_bytes(CableNumber::Cable0, &bytes).unwrap();
             let result = midi_class.send_packet(packet);
 
             println!("Send result {:?}", result);

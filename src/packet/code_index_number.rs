@@ -92,10 +92,10 @@ impl From<CodeIndexNumber> for U4 {
 }
 
 impl CodeIndexNumber {
-    /// Creates a new number from a MIDI event.
-    pub fn try_from_event(event: &[u8]) -> Result<Self, MidiPacketParsingError> {
-        let Some(status) = event.first() else {
-            return Err(MidiPacketParsingError::EmptyEvent);
+    /// Creates a new number from a MIDI event payload.
+    pub fn try_from_payload(payload: &[u8]) -> Result<Self, MidiPacketParsingError> {
+        let Some(status) = payload.first() else {
+            return Err(MidiPacketParsingError::EmptyPayload);
         };
 
         if *status < 0xF0 {
@@ -107,7 +107,7 @@ impl CodeIndexNumber {
                 0xC0 => Ok(Self::ProgramChange),
                 0xD0 => Ok(Self::ChannelPressure),
                 0xE0 => Ok(Self::PitchBendChange),
-                _ => Err(MidiPacketParsingError::InvalidEventStatus),
+                _ => Err(MidiPacketParsingError::InvalidPayloadStatus),
             }
         } else {
             match status {
@@ -115,13 +115,13 @@ impl CodeIndexNumber {
                 0xF2 => Ok(Self::SystemCommon3Bytes),
                 0xF6 => Ok(Self::SystemCommon1Byte),
                 0xF8 | 0xFA | 0xFB | 0xFC | 0xFE | 0xFF => Ok(Self::SingleByte),
-                _ => Err(MidiPacketParsingError::InvalidEventStatus),
+                _ => Err(MidiPacketParsingError::InvalidPayloadStatus),
             }
         }
     }
 
-    /// Returns the size of the MIDI_x event in bytes.
-    pub fn event_size(&self) -> usize {
+    /// Returns the size of the MIDI_x event payload in bytes.
+    pub fn payload_size(&self) -> usize {
         match self {
             Self::SystemCommon1Byte | Self::SingleByte => 1,
             Self::SystemCommon2Bytes

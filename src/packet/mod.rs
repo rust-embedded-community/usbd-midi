@@ -38,12 +38,12 @@ pub enum MidiPacketParsingError {
     InvalidEventType(u8),
     /// Missing data packet.
     MissingDataPacket,
-    /// Empty event.
-    EmptyEvent,
-    /// Invalid event status.
-    InvalidEventStatus,
-    /// Invalid event size.
-    InvalidEventSize,
+    /// Empty payload.
+    EmptyPayload,
+    /// Invalid payload status.
+    InvalidPayloadStatus,
+    /// Invalid payload size.
+    InvalidPayloadSize,
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
@@ -67,13 +67,13 @@ impl UsbMidiEventPacket {
         CableNumber::try_from(raw_cable_number).unwrap_or_default()
     }
 
-    /// Returns a slice to the message bytes. The length is dependent on the message type.
-    pub fn as_message_bytes(&self) -> &[u8] {
+    /// Returns a slice to the event payload bytes. The length is dependent on the payload type.
+    pub fn payload_bytes(&self) -> &[u8] {
         let raw_cin = self.raw[0] & 0x0F;
 
         match CodeIndexNumber::try_from(raw_cin) {
             Ok(cin) => {
-                let size = cin.event_size();
+                let size = cin.payload_size();
                 &self.raw[1..1 + size]
             }
 
@@ -92,21 +92,21 @@ impl UsbMidiEventPacket {
         self.raw
     }
 
-    /// Creates a packet from a slice of message bytes.
-    pub fn try_from_message_bytes(
+    /// Creates a packet from a slice of event payload bytes.
+    pub fn try_from_payload_bytes(
         cable: CableNumber,
         bytes: &[u8],
     ) -> Result<Self, MidiPacketParsingError> {
-        let cin = CodeIndexNumber::try_from_event(bytes)?;
-        let event_size = cin.event_size();
+        let cin = CodeIndexNumber::try_from_payload(bytes)?;
+        let payload_size = cin.payload_size();
 
-        if bytes.len() < event_size {
-            return Err(MidiPacketParsingError::InvalidEventSize);
+        if bytes.len() < payload_size {
+            return Err(MidiPacketParsingError::InvalidPayloadSize);
         }
 
         let mut raw = [0; 4];
         raw[0] = (cable as u8) << 4 | cin as u8;
-        raw[1..1 + event_size].copy_from_slice(&bytes[..event_size]);
+        raw[1..1 + payload_size].copy_from_slice(&bytes[..payload_size]);
 
         Ok(Self { raw })
     }
