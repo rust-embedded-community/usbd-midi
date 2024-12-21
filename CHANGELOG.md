@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `CodeIndexNumber::try_from_event` function.
 - `CodeIndexNumber::event_size` function.
 - `CableNumber::Cable0` as default value.
+- `FromOverFlow<u8> for U4` implementation.
+- `FromClamped<u8> for U4` implementation.
 - Re-exports of common items in crate root.
 
 ### Changed

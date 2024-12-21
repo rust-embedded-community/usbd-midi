@@ -1,5 +1,7 @@
 //! A primitive value with 4-bit length.
 
+use crate::data::{FromClamped, FromOverFlow};
+
 /// A primitive value that can be from 0-0x0F
 pub struct U4(u8);
 
@@ -21,6 +23,23 @@ impl TryFrom<u8> for U4 {
 impl From<U4> for u8 {
     fn from(value: U4) -> u8 {
         value.0
+    }
+}
+
+impl FromOverFlow<u8> for U4 {
+    fn from_overflow(value: u8) -> U4 {
+        const MASK: u8 = 0b0000_1111;
+        let value = MASK & value;
+        U4(value)
+    }
+}
+
+impl FromClamped<u8> for U4 {
+    fn from_clamped(value: u8) -> U4 {
+        match U4::try_from(value) {
+            Ok(x) => x,
+            _ => U4::MAX,
+        }
     }
 }
 
