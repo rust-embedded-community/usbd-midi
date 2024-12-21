@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+This release focuses on:
+
+- Increased usability by simplifying the internal module structure.
+- Interfacing with third-party crates like `midi-types`.
+
 **NOTE:** The `message` module containing the `Message` struct and related types is now gated behind the `message-types` feature. This feature is enabled by default.
 
 ### Added
