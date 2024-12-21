@@ -42,6 +42,8 @@ pub enum MidiPacketParsingError {
     EmptyEvent,
     /// Invalid event status.
     InvalidEventStatus,
+    /// Invalid event size.
+    InvalidEventSize,
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
@@ -97,6 +99,10 @@ impl UsbMidiEventPacket {
     ) -> Result<Self, MidiPacketParsingError> {
         let cin = CodeIndexNumber::try_from_event(bytes)?;
         let event_size = cin.event_size();
+
+        if bytes.len() < event_size {
+            return Err(MidiPacketParsingError::InvalidEventSize);
+        }
 
         let mut raw = [0; 4];
         raw[0] = (cable as u8) << 4 | cin as u8;
