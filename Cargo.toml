@@ -16,14 +16,15 @@ keywords = ["usb", "midi"]
 
 [features]
 default = ["message-types"]
-message-types = []
+message-types = ["dep:num_enum"]
 
 [dependencies]
 usb-device = "0.3"
 
 [dependencies.num_enum]
-version = "0.7.2"
+version = "0.7.3"
 default-features = false
+optional = true
 
 [lints.rust]
 missing_docs = "warn"
