@@ -13,7 +13,10 @@ This release focuses on:
 - Interfacing with third-party crates like `midi-types`.
 - Support for System Exclusive messages (SysEx).
 
-**NOTE:** The `message` module containing the `Message` struct and related types is now gated behind the `message-types` feature. This feature is enabled by default.
+**Important:**
+
+- The `message` module containing the `Message` struct and related types is now gated behind the `message-types` feature. This feature is enabled by default.
+- The constants `USB_AUDIO_CLASS`, `USB_AUDIOCONTROL_SUBCLASS` and `USB_MIDISTREAMING_SUBCLASS` are now private to prevent them from being used in the device setup. Doing so would lead to incorrect enumeration on certain hosts (e.g. macOS).
 
 ### Added
 
