@@ -11,6 +11,7 @@ This release focuses on:
 
 - Increased usability by simplifying the internal module structure.
 - Interfacing with third-party crates like `midi-types`.
+- Support for System Exclusive messages (SysEx).
 
 **NOTE:** The `message` module containing the `Message` struct and related types is now gated behind the `message-types` feature. This feature is enabled by default.
 
