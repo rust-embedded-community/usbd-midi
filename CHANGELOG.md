@@ -22,6 +22,9 @@ This release focuses on:
 - `UsbMidiEventPacket::as_raw_bytes` function.
 - `UsbMidiEventPacket::to_raw_bytes` function.
 - `UsbMidiEventPacket::try_from_payload_bytes` function.
+- `UsbMidiEventPacket::is_sysex` function.
+- `UsbMidiEventPacket::is_sysex_start` function.
+- `UsbMidiEventPacket::is_sysex_end` function.
 - `TryFrom<&UsbMidiEventPacket>` implementation for `Message` type.
 - `Message::into_packet` function.
 - `Message::code_index_number` function.

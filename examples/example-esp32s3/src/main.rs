@@ -8,6 +8,7 @@ use core::ptr::addr_of_mut;
 use esp_backtrace as _;
 use esp_hal::{clock, gpio, otg_fs, xtensa_lx_rt, Config};
 use esp_println::println;
+use heapless::Vec;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
 use midi_convert::{parse::MidiTryParseSlice, render_slice::MidiRenderSlice};
 use usb_device::prelude::*;
@@ -41,6 +42,8 @@ fn main() -> ! {
     let button = gpio::Input::new(peripherals.GPIO0, gpio::Pull::Up);
     let mut last_button_level = button.level();
 
+    let mut sysex_buffer = Vec::<u8, 64>::new();
+
     loop {
         if usb_dev.poll(&mut [&mut midi_class]) {
             // Receive messages.
@@ -48,10 +51,32 @@ fn main() -> ! {
 
             if let Ok(size) = midi_class.read(&mut buffer) {
                 let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
-                for packet in buffer_reader.into_iter() {
-                    if let Ok(packet) = packet {
+                for packet in buffer_reader.into_iter().flatten() {
+                    if !packet.is_sysex() {
                         let message = MidiMessage::try_parse_slice(packet.payload_bytes());
-                        println!("Cable: {:?}, Message: {:?}", packet.cable_number(), message);
+                        println!(
+                            "Regular Message, cable: {:?}, message: {:?}",
+                            packet.cable_number(),
+                            message
+                        );
+                    } else {
+                        if packet.is_sysex_start() {
+                            println!("SysEx message start");
+                            sysex_buffer.clear();
+                        }
+
+                        match sysex_buffer.extend_from_slice(packet.payload_bytes()) {
+                            Ok(_) => {
+                                if packet.is_sysex_end() {
+                                    println!("SysEx message end");
+                                    println!("Buffered SysEx message: {:?}", sysex_buffer);
+                                }
+                            }
+                            Err(_) => {
+                                println!("SysEx buffer overflow.");
+                                break;
+                            }
+                        }
                     }
                 }
             }

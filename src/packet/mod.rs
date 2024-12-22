@@ -115,4 +115,30 @@ impl UsbMidiEventPacket {
 
         Ok(Self { raw })
     }
+
+    /// Returns if the packet payload is part of a SysEx message.
+    pub fn is_sysex(&self) -> bool {
+        let Ok(cin) = CodeIndexNumber::try_from(self.raw[0] & 0x0F) else {
+            return false;
+        };
+
+        match cin {
+            CodeIndexNumber::SysexStartsOrContinues
+            | CodeIndexNumber::SysexEnds2Bytes
+            | CodeIndexNumber::SysexEnds3Bytes => true,
+            CodeIndexNumber::SystemCommon1Byte => self.raw[1] == 0xF7,
+            CodeIndexNumber::SingleByte => self.raw[1] < 0x80,
+            _ => false,
+        }
+    }
+
+    /// Returns if the packet payload contains the start of a SysEx message.
+    pub fn is_sysex_start(&self) -> bool {
+        self.is_sysex() && self.raw[1] == 0xF0
+    }
+
+    /// Returns if the packet payload contains the end of a SysEx message.
+    pub fn is_sysex_end(&self) -> bool {
+        self.is_sysex() && (self.raw[1] == 0xF7 || self.raw[2] == 0xF7 || self.raw[3] == 0xF7)
+    }
 }

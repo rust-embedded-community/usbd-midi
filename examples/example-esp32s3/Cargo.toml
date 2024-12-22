@@ -14,3 +14,4 @@ esp-println = { version = "0.12.0", features = ["esp32s3", "log"] }
 usb-device = { version = "0.3.2", features = ["control-buffer-256"] }
 usbd-midi = { path = "../../" }
 midi-convert = "0.2.0"
+heapless = "0.8.0"
