@@ -86,6 +86,8 @@ impl TryFrom<u8> for CodeIndexNumber {
 
 impl CodeIndexNumber {
     /// Creates a new number from a MIDI event payload.
+    ///
+    /// The detection is based on the content and ignores the slice length.
     pub fn try_from_payload(payload: &[u8]) -> Result<Self, MidiPacketParsingError> {
         let Some(status) = payload.first() else {
             return Err(MidiPacketParsingError::EmptyPayload);
@@ -107,7 +109,7 @@ impl CodeIndexNumber {
                 0xF1 | 0xF3 => Ok(Self::SystemCommon2Bytes),
                 0xF2 => Ok(Self::SystemCommon3Bytes),
                 0xF6 => Ok(Self::SystemCommon1Byte),
-                0xF8 | 0xFA | 0xFB | 0xFC | 0xFE | 0xFF => Ok(Self::SingleByte),
+                0xF8 | 0xF9 | 0xFA | 0xFB | 0xFC | 0xFE | 0xFF => Ok(Self::SingleByte),
                 _ => Err(MidiPacketParsingError::InvalidPayloadStatus),
             }
         }
@@ -134,5 +136,47 @@ impl CodeIndexNumber {
             // We assume the maximum length of 3 bytes so that no data can get lost.
             Self::MiscFunction | Self::CableEvents => 3,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! encode_payload_test {
+        ($($id:ident: $value:expr,)*) => {
+            $(
+                #[test]
+                fn $id() {
+                    let (payload, expected) = $value;
+                    let cin = CodeIndexNumber::try_from_payload(&payload);
+                    assert_eq!(cin, expected);
+                }
+            )*
+        }
+    }
+
+    encode_payload_test! {
+        note_off: ([0x80, 60, 64], Ok(CodeIndexNumber::NoteOff)),
+        note_on: ([0x90, 60, 64], Ok(CodeIndexNumber::NoteOn)),
+        poly_key_press: ([0xA0, 48, 32], Ok(CodeIndexNumber::PolyKeyPress)),
+        control_change: ([0xB0, 10, 127], Ok(CodeIndexNumber::ControlChange)),
+        program_change: ([0xC0, 5], Ok(CodeIndexNumber::ProgramChange)),
+        channel_pressure: ([0xD0, 54], Ok(CodeIndexNumber::ChannelPressure)),
+        pitch_bend: ([0xE0, 32, 96], Ok(CodeIndexNumber::PitchBendChange)),
+        mtc_quarter_frame: ([0xF1, 12], Ok(CodeIndexNumber::SystemCommon2Bytes)),
+        song_position_pointer: ([0xF2, 3, 8], Ok(CodeIndexNumber::SystemCommon3Bytes)),
+        song_select: ([0xF3, 15], Ok(CodeIndexNumber::SystemCommon2Bytes)),
+        tune_request: ([0xF6], Ok(CodeIndexNumber::SystemCommon1Byte)),
+        timing_clock: ([0xF8], Ok(CodeIndexNumber::SingleByte)),
+        tick: ([0xF9], Ok(CodeIndexNumber::SingleByte)),
+        start: ([0xFA], Ok(CodeIndexNumber::SingleByte)),
+        continue_: ([0xFB], Ok(CodeIndexNumber::SingleByte)),
+        stop: ([0xFC], Ok(CodeIndexNumber::SingleByte)),
+        active_sensing: ([0xFE], Ok(CodeIndexNumber::SingleByte)),
+        system_reset: ([0xFF], Ok(CodeIndexNumber::SingleByte)),
+        undefined_f4: ([0xF4], Err(MidiPacketParsingError::InvalidPayloadStatus)),
+        undefined_f5: ([0xF5], Err(MidiPacketParsingError::InvalidPayloadStatus)),
+        empty: ([], Err(MidiPacketParsingError::EmptyPayload)),
     }
 }
