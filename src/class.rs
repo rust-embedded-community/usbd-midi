@@ -39,6 +39,7 @@ pub struct MidiClass<'a, B: UsbBus> {
 }
 
 /// Error variants for read operations.
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MidiReadError {
     /// Parsing of the packet failed.
     ParsingFailed(MidiPacketParsingError),

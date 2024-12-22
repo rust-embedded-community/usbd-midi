@@ -24,7 +24,7 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
 }
 
 /// Error variants for parsing the packet.
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MidiPacketParsingError {
     /// Invalid packet.
     InvalidPacket,
