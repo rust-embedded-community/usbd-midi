@@ -208,4 +208,68 @@ mod tests {
             empty: ([0x00, 0, 0, 0], (CableNumber::Cable0, [0, 0, 0], false, false, false)),
         }
     }
+
+    mod encode {
+        use super::*;
+
+        macro_rules! encode_packet_test {
+            ($($id:ident: $value:expr,)*) => {
+                $(
+                    #[test]
+                    fn $id() {
+                        let ((cable, payload), expected) = $value;
+                        let payload = payload.as_slice();
+                        let encoded = UsbMidiEventPacket::try_from_payload_bytes(cable, payload);
+                        let expected: Result<[u8; 4], MidiPacketParsingError> = expected;
+                        assert_eq!(encoded, expected.map(
+                            |v| UsbMidiEventPacket::try_from(v.as_slice()).unwrap())
+                        );
+                    }
+                )*
+            }
+        }
+
+        encode_packet_test! {
+            note_off: ((CableNumber::Cable3, [0x80, 33, 75]), Ok([0x38, 0x80, 33, 75])),
+            note_on: ((CableNumber::Cable2, [0x96, 67, 14]), Ok([0x29, 0x96, 67, 14])),
+            poly_key_press: ((CableNumber::Cable0, [0xA0, 48, 72]), Ok([0x0A, 0xA0, 48, 72])),
+            control_change: ((CableNumber::Cable0, [0xB0, 10, 127]), Ok([0x0B, 0xB0, 10, 127])),
+            program_change: ((CableNumber::Cable0, [0xC0, 36]), Ok([0x0C, 0xC0, 36, 0])),
+            program_change_extra: ((CableNumber::Cable0, [0xC0, 36, 54]), Ok([0x0C, 0xC0, 36, 0])),
+            channel_pressure: ((CableNumber::Cable0, [0xD0, 115]), Ok([0x0D, 0xD0, 115, 0])),
+            channel_pressure_extra: ((CableNumber::Cable0, [0xD0, 115, 27]), Ok([0x0D, 0xD0, 115, 0])),
+            pitch_bend: ((CableNumber::Cable0, [0xE0, 93, 46]), Ok([0x0E, 0xE0, 93, 46])),
+            mtc_quarter_frame: ((CableNumber::Cable0, [0xF1, 102, 46]), Ok([0x02, 0xF1, 102, 0])),
+            mtc_quarter_frame_extra: ((CableNumber::Cable0, [0xF1, 102, 46, 7]), Ok([0x02, 0xF1, 102, 0])),
+            song_position_pointer: ((CableNumber::Cable0, [0xF2, 42, 74]), Ok([0x03, 0xF2, 42, 74])),
+            song_select: ((CableNumber::Cable0, [0xF3, 24]), Ok([0x02, 0xF3, 24, 0])),
+            song_select_extra: ((CableNumber::Cable0, [0xF3, 24, 96]), Ok([0x02, 0xF3, 24, 0])),
+            tune_request: ((CableNumber::Cable0, [0xF6]), Ok([0x05, 0xF6, 0, 0])),
+            tune_request_extra: ((CableNumber::Cable0, [0xF6, 67, 72]), Ok([0x05, 0xF6, 0, 0])),
+            timing_clock: ((CableNumber::Cable0, [0xF8]), Ok([0x0F, 0xF8, 0, 0])),
+            timing_clock_extra: ((CableNumber::Cable0, [0xF8, 38, 126]), Ok([0x0F, 0xF8, 0, 0])),
+            tick: ((CableNumber::Cable0, [0xF9]), Ok([0x0F, 0xF9, 0, 0])),
+            start: ((CableNumber::Cable0, [0xFA]), Ok([0x0F, 0xFA, 0, 0])),
+            continue_: ((CableNumber::Cable0, [0xFB]), Ok([0x0F, 0xFB, 0, 0])),
+            stop: ((CableNumber::Cable0, [0xFC]), Ok([0x0F, 0xFC, 0, 0])),
+            active_sensing: ((CableNumber::Cable0, [0xFE]), Ok([0x0F, 0xFE, 0, 0])),
+            system_reset: ((CableNumber::Cable0, [0xFF]), Ok([0x0F, 0xFF, 0, 0])),
+            sysex_starts: ((CableNumber::Cable0, [0xF0, 1, 2]), Ok([0x04, 0xF0, 1, 2])),
+            sysex_starts_1byte: ((CableNumber::Cable0, [0xF0]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            sysex_starts_2bytes: ((CableNumber::Cable0, [0xF0, 1]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            sysex_continues_1byte: ((CableNumber::Cable0, [1]), Ok([0x0F, 1, 0, 0])),
+            sysex_continues_2bytes: ((CableNumber::Cable0, [1, 2]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            sysex_continues_3bytes: ((CableNumber::Cable0, [1, 2, 3]), Ok([0x04, 1, 2, 3])),
+            sysex_ends_1byte: ((CableNumber::Cable0, [0xF7]), Ok([0x05, 0xF7, 0, 0])),
+            sysex_ends_2bytes: ((CableNumber::Cable0, [1, 0xF7]), Ok([0x06, 1, 0xF7, 0])),
+            sysex_ends_3bytes: ((CableNumber::Cable0, [1, 2, 0xF7]), Ok([0x07, 1, 2, 0xF7])),
+            sysex_2bytes: ((CableNumber::Cable0, [0xF0, 0xF7]), Ok([0x06, 0xF0, 0xF7, 0])),
+            sysex_3bytes: ((CableNumber::Cable0, [0xF0, 1, 0xF7]), Ok([0x07, 0xF0, 1, 0xF7])),
+            undefined_f4: ((CableNumber::Cable0, [0xF4]), Err(MidiPacketParsingError::InvalidPayloadStatus)),
+            undefined_f5: ((CableNumber::Cable0, [0xF5]), Err(MidiPacketParsingError::InvalidPayloadStatus)),
+            note_off_missing_1byte: ((CableNumber::Cable3, [0x80, 26]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            note_off_missing_2bytes: ((CableNumber::Cable3, [0x80]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            empty: ((CableNumber::Cable0, []), Err(MidiPacketParsingError::EmptyPayload)),
+        }
+    }
 }

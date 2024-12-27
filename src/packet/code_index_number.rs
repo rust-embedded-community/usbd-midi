@@ -200,7 +200,7 @@ mod tests {
         system_reset: ([0xFF], Ok(CodeIndexNumber::SingleByte)),
         sysex_starts: ([0xF0, 1, 2], Ok(CodeIndexNumber::SysexStartsOrContinues)),
         sysex_starts_1byte: ([0xF0], Err(MidiPacketParsingError::InvalidPayloadSize)),
-        sysex_starts_2byte: ([0xF0, 1], Err(MidiPacketParsingError::InvalidPayloadSize)),
+        sysex_starts_2bytes: ([0xF0, 1], Err(MidiPacketParsingError::InvalidPayloadSize)),
         sysex_continues_1byte: ([1], Ok(CodeIndexNumber::SingleByte)),
         sysex_continues_2bytes: ([1, 2], Err(MidiPacketParsingError::InvalidPayloadSize)),
         sysex_continues_3bytes: ([1, 2, 3], Ok(CodeIndexNumber::SysexStartsOrContinues)),
