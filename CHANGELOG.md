@@ -48,6 +48,7 @@ This release focuses on:
 - Renamed `midi_packet_reader` module to `reader`.
 - Renamed `MidiPacketBufferReader` to `UsbMidiPacketReader`.
 - Renamed `MidiPacketParsingError` to `UsbMidiEventPacketError`
+- Renamed `MidiReadError` to `UsbMidiReadError`
 - Moved `usb_midi_event_packet` code into parent `packet` module.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
