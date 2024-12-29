@@ -18,7 +18,7 @@ use usbd_midi::{
     message::{channel::Channel, notes::Note},
     Message,
     MidiClass,
-    MidiPacketBufferReader,
+    UsbMidiPacketReader,
 };
 
 // Prerequisites, must be setup according to the used board.
@@ -46,8 +46,8 @@ loop {
     let mut buffer = [0; 64];
 
     if let Ok(size) = midi.read(&mut buffer) {
-        let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
-        for packet in buffer_reader.into_iter() {
+        let packet_reader = UsbMidiPacketReader::new(&buffer, size);
+        for packet in packet_reader.into_iter() {
             if let Ok(packet) = packet {
                 match Message::try_from(&packet).unwrap() {
                     Message::NoteOn(Channel1, Note::C2, ..) => {

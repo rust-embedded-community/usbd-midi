@@ -59,8 +59,8 @@ fn main() -> ! {
             let mut buffer = [0; 64];
 
             if let Ok(size) = midi_class.read(&mut buffer) {
-                let buffer_reader = UsbMidiPacketReader::new(&buffer, size);
-                for packet in buffer_reader.into_iter().flatten() {
+                let packet_reader = UsbMidiPacketReader::new(&buffer, size);
+                for packet in packet_reader.into_iter().flatten() {
                     if !packet.is_sysex() {
                         // Just a regular 3-byte message that can be processed directly.
                         let message = MidiMessage::try_parse_slice(packet.payload_bytes());
