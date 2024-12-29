@@ -3,7 +3,7 @@
 use usb_device::class_prelude::*;
 use usb_device::Result;
 
-use crate::packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::packet::{UsbMidiEventPacket, UsbMidiEventPacketError};
 
 // Constants for use in descriptors.
 const USB_AUDIO_CLASS: u8 = 0x01;
@@ -42,7 +42,7 @@ pub struct MidiClass<'a, B: UsbBus> {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MidiReadError {
     /// Parsing of the packet failed.
-    ParsingFailed(MidiPacketParsingError),
+    ParsingFailed(UsbMidiEventPacketError),
     /// USB stack error returned from `usb-device`.
     UsbError(UsbError),
 }

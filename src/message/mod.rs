@@ -14,7 +14,7 @@ use crate::message::notes::Note;
 use crate::message::raw::{Payload, Raw};
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
-use crate::packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::packet::{UsbMidiEventPacket, UsbMidiEventPacketError};
 
 type Velocity = U7;
 
@@ -92,12 +92,12 @@ impl From<Message> for Raw {
 }
 
 impl TryFrom<&[u8]> for Message {
-    type Error = MidiPacketParsingError;
+    type Error = UsbMidiEventPacketError;
 
     fn try_from(data: &[u8]) -> Result<Self, Self::Error> {
         let status_byte = match data.first() {
             Some(byte) => byte,
-            None => return Err(MidiPacketParsingError::MissingDataPacket),
+            None => return Err(UsbMidiEventPacketError::MissingDataPacket),
         };
 
         let event_type = status_byte & 0b1111_0000;
@@ -133,13 +133,13 @@ impl TryFrom<&[u8]> for Message {
                 ControlFunction(get_u7_at(data, 1)?),
                 get_u7_at(data, 2)?,
             )),
-            _ => Err(MidiPacketParsingError::InvalidEventType(event_type)),
+            _ => Err(UsbMidiEventPacketError::InvalidEventType(event_type)),
         }
     }
 }
 
 impl TryFrom<&UsbMidiEventPacket> for Message {
-    type Error = MidiPacketParsingError;
+    type Error = UsbMidiEventPacketError;
 
     fn try_from(value: &UsbMidiEventPacket) -> Result<Self, Self::Error> {
         Self::try_from(&value.as_raw_bytes()[1..])
@@ -188,23 +188,23 @@ impl Message {
     }
 }
 
-fn get_note(data: &[u8]) -> Result<Note, MidiPacketParsingError> {
+fn get_note(data: &[u8]) -> Result<Note, UsbMidiEventPacketError> {
     let note_byte = get_byte_at_position(data, 1)?;
     match Note::try_from(note_byte) {
         Ok(note) => Ok(note),
-        Err(_) => Err(MidiPacketParsingError::InvalidNote(note_byte)),
+        Err(_) => Err(UsbMidiEventPacketError::InvalidNote(note_byte)),
     }
 }
 
-fn get_u7_at(data: &[u8], index: usize) -> Result<U7, MidiPacketParsingError> {
+fn get_u7_at(data: &[u8], index: usize) -> Result<U7, UsbMidiEventPacketError> {
     let data_byte = get_byte_at_position(data, index)?;
     Ok(U7::from_clamped(data_byte))
 }
 
-fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, MidiPacketParsingError> {
+fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, UsbMidiEventPacketError> {
     match data.get(index) {
         Some(byte) => Ok(*byte),
-        None => Err(MidiPacketParsingError::MissingDataPacket),
+        None => Err(UsbMidiEventPacketError::MissingDataPacket),
     }
 }
 

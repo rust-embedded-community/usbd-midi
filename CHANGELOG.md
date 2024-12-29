@@ -47,13 +47,14 @@ This release focuses on:
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
 - Renamed `midi_packet_reader` module to `reader`.
 - Renamed `MidiPacketBufferReader` to `UsbMidiPacketReader`.
+- Renamed `MidiPacketParsingError` to `UsbMidiEventPacketError`
 - Moved `usb_midi_event_packet` code into parent `packet` module.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
 - Moved `byte` submodules into `message::data` module.
 - Moved `from_traits` code into parent `data` module.
-- Consolidated separate `InvalidCableNumber` struct into `MidiPacketParsingError`.
-- Consolidated separate `InvalidCodeIndexNumber` struct into `MidiPacketParsingError`.
+- Consolidated separate `InvalidCableNumber` struct into `UsbMidiEventPacketError`.
+- Consolidated separate `InvalidCodeIndexNumber` struct into `UsbMidiEventPacketError`.
 - Converted `CodeIndexNumber` struct to enum.
 - Moved descriptor constants into class module and made them private.
 

@@ -1,6 +1,6 @@
 //! Enum representing the cable number of a packet.
 
-use crate::packet::MidiPacketParsingError;
+use crate::packet::UsbMidiEventPacketError;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF
 /// indicating the number assignment of the Embedded MIDI Jack associated
@@ -29,7 +29,7 @@ pub enum CableNumber {
 }
 
 impl TryFrom<u8> for CableNumber {
-    type Error = MidiPacketParsingError;
+    type Error = UsbMidiEventPacketError;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
@@ -49,7 +49,7 @@ impl TryFrom<u8> for CableNumber {
             x if x == CableNumber::Cable13 as u8 => Ok(CableNumber::Cable13),
             x if x == CableNumber::Cable14 as u8 => Ok(CableNumber::Cable14),
             x if x == CableNumber::Cable15 as u8 => Ok(CableNumber::Cable15),
-            _ => Err(MidiPacketParsingError::InvalidCableNumber(value)),
+            _ => Err(UsbMidiEventPacketError::InvalidCableNumber(value)),
         }
     }
 }

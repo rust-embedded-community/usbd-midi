@@ -25,7 +25,7 @@ impl From<UsbMidiEventPacket> for [u8; 4] {
 
 /// Error variants for parsing the packet.
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum MidiPacketParsingError {
+pub enum UsbMidiEventPacketError {
     /// Invalid packet.
     InvalidPacket,
     /// Invalid note.
@@ -47,11 +47,11 @@ pub enum MidiPacketParsingError {
 }
 
 impl TryFrom<&[u8]> for UsbMidiEventPacket {
-    type Error = MidiPacketParsingError;
+    type Error = UsbMidiEventPacketError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let Ok(raw) = value.try_into() else {
-            return Err(MidiPacketParsingError::InvalidPacket);
+            return Err(UsbMidiEventPacketError::InvalidPacket);
         };
 
         Ok(Self { raw })
@@ -101,12 +101,12 @@ impl UsbMidiEventPacket {
     pub fn try_from_payload_bytes(
         cable: CableNumber,
         bytes: &[u8],
-    ) -> Result<Self, MidiPacketParsingError> {
+    ) -> Result<Self, UsbMidiEventPacketError> {
         let cin = CodeIndexNumber::try_from_payload(bytes)?;
         let payload_size = cin.payload_size();
 
         if bytes.len() < payload_size {
-            return Err(MidiPacketParsingError::InvalidPayloadSize);
+            return Err(UsbMidiEventPacketError::InvalidPayloadSize);
         }
 
         let mut raw = [0; 4];
@@ -220,7 +220,7 @@ mod tests {
                         let ((cable, payload), expected) = $value;
                         let payload = payload.as_slice();
                         let encoded = UsbMidiEventPacket::try_from_payload_bytes(cable, payload);
-                        let expected: Result<[u8; 4], MidiPacketParsingError> = expected;
+                        let expected: Result<[u8; 4], UsbMidiEventPacketError> = expected;
                         assert_eq!(encoded, expected.map(
                             |v| UsbMidiEventPacket::try_from(v.as_slice()).unwrap())
                         );
@@ -255,21 +255,21 @@ mod tests {
             active_sensing: ((CableNumber::Cable0, [0xFE]), Ok([0x0F, 0xFE, 0, 0])),
             system_reset: ((CableNumber::Cable0, [0xFF]), Ok([0x0F, 0xFF, 0, 0])),
             sysex_starts: ((CableNumber::Cable0, [0xF0, 1, 2]), Ok([0x04, 0xF0, 1, 2])),
-            sysex_starts_1byte: ((CableNumber::Cable0, [0xF0]), Err(MidiPacketParsingError::InvalidPayloadSize)),
-            sysex_starts_2bytes: ((CableNumber::Cable0, [0xF0, 1]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            sysex_starts_1byte: ((CableNumber::Cable0, [0xF0]), Err(UsbMidiEventPacketError::InvalidPayloadSize)),
+            sysex_starts_2bytes: ((CableNumber::Cable0, [0xF0, 1]), Err(UsbMidiEventPacketError::InvalidPayloadSize)),
             sysex_continues_1byte: ((CableNumber::Cable0, [1]), Ok([0x0F, 1, 0, 0])),
-            sysex_continues_2bytes: ((CableNumber::Cable0, [1, 2]), Err(MidiPacketParsingError::InvalidPayloadSize)),
+            sysex_continues_2bytes: ((CableNumber::Cable0, [1, 2]), Err(UsbMidiEventPacketError::InvalidPayloadSize)),
             sysex_continues_3bytes: ((CableNumber::Cable0, [1, 2, 3]), Ok([0x04, 1, 2, 3])),
             sysex_ends_1byte: ((CableNumber::Cable0, [0xF7]), Ok([0x05, 0xF7, 0, 0])),
             sysex_ends_2bytes: ((CableNumber::Cable0, [1, 0xF7]), Ok([0x06, 1, 0xF7, 0])),
             sysex_ends_3bytes: ((CableNumber::Cable0, [1, 2, 0xF7]), Ok([0x07, 1, 2, 0xF7])),
             sysex_2bytes: ((CableNumber::Cable0, [0xF0, 0xF7]), Ok([0x06, 0xF0, 0xF7, 0])),
             sysex_3bytes: ((CableNumber::Cable0, [0xF0, 1, 0xF7]), Ok([0x07, 0xF0, 1, 0xF7])),
-            undefined_f4: ((CableNumber::Cable0, [0xF4]), Err(MidiPacketParsingError::InvalidPayloadStatus)),
-            undefined_f5: ((CableNumber::Cable0, [0xF5]), Err(MidiPacketParsingError::InvalidPayloadStatus)),
-            note_off_missing_1byte: ((CableNumber::Cable3, [0x80, 26]), Err(MidiPacketParsingError::InvalidPayloadSize)),
-            note_off_missing_2bytes: ((CableNumber::Cable3, [0x80]), Err(MidiPacketParsingError::InvalidPayloadSize)),
-            empty: ((CableNumber::Cable0, []), Err(MidiPacketParsingError::EmptyPayload)),
+            undefined_f4: ((CableNumber::Cable0, [0xF4]), Err(UsbMidiEventPacketError::InvalidPayloadStatus)),
+            undefined_f5: ((CableNumber::Cable0, [0xF5]), Err(UsbMidiEventPacketError::InvalidPayloadStatus)),
+            note_off_missing_1byte: ((CableNumber::Cable3, [0x80, 26]), Err(UsbMidiEventPacketError::InvalidPayloadSize)),
+            note_off_missing_2bytes: ((CableNumber::Cable3, [0x80]), Err(UsbMidiEventPacketError::InvalidPayloadSize)),
+            empty: ((CableNumber::Cable0, []), Err(UsbMidiEventPacketError::EmptyPayload)),
         }
     }
 }

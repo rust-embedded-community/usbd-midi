@@ -1,6 +1,6 @@
 //! Enum representing the code index number of a packet.
 
-use crate::packet::MidiPacketParsingError;
+use crate::packet::UsbMidiEventPacketError;
 
 /// The Code Index Number(CIN) indicates the classification
 /// of the bytes in the MIDI_x fields.
@@ -43,7 +43,7 @@ pub enum CodeIndexNumber {
 }
 
 impl TryFrom<u8> for CodeIndexNumber {
-    type Error = MidiPacketParsingError;
+    type Error = UsbMidiEventPacketError;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
@@ -79,7 +79,7 @@ impl TryFrom<u8> for CodeIndexNumber {
                 Ok(CodeIndexNumber::PitchBendChange)
             }
             x if x == CodeIndexNumber::SingleByte as u8 => Ok(CodeIndexNumber::SingleByte),
-            _ => Err(MidiPacketParsingError::InvalidCodeIndexNumber(value)),
+            _ => Err(UsbMidiEventPacketError::InvalidCodeIndexNumber(value)),
         }
     }
 }
@@ -88,9 +88,9 @@ impl CodeIndexNumber {
     /// Creates a new number from a MIDI event payload.
     ///
     /// The detection is based on the content and ignores the slice length.
-    pub fn try_from_payload(payload: &[u8]) -> Result<Self, MidiPacketParsingError> {
+    pub fn try_from_payload(payload: &[u8]) -> Result<Self, UsbMidiEventPacketError> {
         let Some(status) = payload.first() else {
-            return Err(MidiPacketParsingError::EmptyPayload);
+            return Err(UsbMidiEventPacketError::EmptyPayload);
         };
 
         if *status < 0xF0 {
@@ -112,7 +112,7 @@ impl CodeIndexNumber {
                     } else if payload.len() > 2 {
                         Ok(Self::SysexStartsOrContinues)
                     } else {
-                        Err(MidiPacketParsingError::InvalidPayloadSize)
+                        Err(UsbMidiEventPacketError::InvalidPayloadSize)
                     }
                 }
             }
@@ -126,14 +126,14 @@ impl CodeIndexNumber {
                     } else if payload.len() > 2 {
                         Ok(Self::SysexStartsOrContinues)
                     } else {
-                        Err(MidiPacketParsingError::InvalidPayloadSize)
+                        Err(UsbMidiEventPacketError::InvalidPayloadSize)
                     }
                 }
                 0xF1 | 0xF3 => Ok(Self::SystemCommon2Bytes),
                 0xF2 => Ok(Self::SystemCommon3Bytes),
                 0xF6 | 0xF7 => Ok(Self::SystemCommon1Byte),
                 0xF8 | 0xF9 | 0xFA | 0xFB | 0xFC | 0xFE | 0xFF => Ok(Self::SingleByte),
-                _ => Err(MidiPacketParsingError::InvalidPayloadStatus),
+                _ => Err(UsbMidiEventPacketError::InvalidPayloadStatus),
             }
         }
     }
@@ -199,18 +199,18 @@ mod tests {
         active_sensing: ([0xFE], Ok(CodeIndexNumber::SingleByte)),
         system_reset: ([0xFF], Ok(CodeIndexNumber::SingleByte)),
         sysex_starts: ([0xF0, 1, 2], Ok(CodeIndexNumber::SysexStartsOrContinues)),
-        sysex_starts_1byte: ([0xF0], Err(MidiPacketParsingError::InvalidPayloadSize)),
-        sysex_starts_2bytes: ([0xF0, 1], Err(MidiPacketParsingError::InvalidPayloadSize)),
+        sysex_starts_1byte: ([0xF0], Err(UsbMidiEventPacketError::InvalidPayloadSize)),
+        sysex_starts_2bytes: ([0xF0, 1], Err(UsbMidiEventPacketError::InvalidPayloadSize)),
         sysex_continues_1byte: ([1], Ok(CodeIndexNumber::SingleByte)),
-        sysex_continues_2bytes: ([1, 2], Err(MidiPacketParsingError::InvalidPayloadSize)),
+        sysex_continues_2bytes: ([1, 2], Err(UsbMidiEventPacketError::InvalidPayloadSize)),
         sysex_continues_3bytes: ([1, 2, 3], Ok(CodeIndexNumber::SysexStartsOrContinues)),
         sysex_ends_1byte: ([0xF7], Ok(CodeIndexNumber::SystemCommon1Byte)),
         sysex_ends_2bytes: ([1, 0xF7], Ok(CodeIndexNumber::SysexEnds2Bytes)),
         sysex_ends_3bytes: ([1, 2, 0xF7], Ok(CodeIndexNumber::SysexEnds3Bytes)),
         sysex_2bytes: ([0xF0, 0xF7], Ok(CodeIndexNumber::SysexEnds2Bytes)),
         sysex_3bytes: ([0xF0, 1, 0xF7], Ok(CodeIndexNumber::SysexEnds3Bytes)),
-        undefined_f4: ([0xF4], Err(MidiPacketParsingError::InvalidPayloadStatus)),
-        undefined_f5: ([0xF5], Err(MidiPacketParsingError::InvalidPayloadStatus)),
-        empty: ([], Err(MidiPacketParsingError::EmptyPayload)),
+        undefined_f4: ([0xF4], Err(UsbMidiEventPacketError::InvalidPayloadStatus)),
+        undefined_f5: ([0xF5], Err(UsbMidiEventPacketError::InvalidPayloadStatus)),
+        empty: ([], Err(UsbMidiEventPacketError::EmptyPayload)),
     }
 }

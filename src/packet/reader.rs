@@ -1,7 +1,7 @@
 //! Reader for received packets.
 
 use crate::class::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
-use crate::packet::{MidiPacketParsingError, UsbMidiEventPacket};
+use crate::packet::{UsbMidiEventPacketError, UsbMidiEventPacket};
 
 /// Packet reader with internal buffer for received message.
 pub struct UsbMidiPacketReader<'a> {
@@ -22,7 +22,7 @@ impl<'a> UsbMidiPacketReader<'a> {
 }
 
 impl Iterator for UsbMidiPacketReader<'_> {
-    type Item = Result<UsbMidiEventPacket, MidiPacketParsingError>;
+    type Item = Result<UsbMidiEventPacket, UsbMidiEventPacketError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.position <= MAX_PACKET_SIZE && self.position < self.raw_bytes_received {
