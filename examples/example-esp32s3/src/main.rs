@@ -12,7 +12,7 @@ use heapless::Vec;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
 use midi_convert::{parse::MidiTryParseSlice, render_slice::MidiRenderSlice};
 use usb_device::prelude::*;
-use usbd_midi::{CableNumber, MidiClass, MidiPacketBufferReader, UsbMidiEventPacket};
+use usbd_midi::{CableNumber, MidiClass, UsbMidiEventPacket, UsbMidiPacketReader};
 
 static mut EP_MEMORY: [u32; 1024] = [0; 1024];
 
@@ -59,7 +59,7 @@ fn main() -> ! {
             let mut buffer = [0; 64];
 
             if let Ok(size) = midi_class.read(&mut buffer) {
-                let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
+                let buffer_reader = UsbMidiPacketReader::new(&buffer, size);
                 for packet in buffer_reader.into_iter().flatten() {
                     if !packet.is_sysex() {
                         // Just a regular 3-byte message that can be processed directly.

@@ -46,6 +46,7 @@ This release focuses on:
 - Renamed `midi_device` module to `class`.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
 - Renamed `midi_packet_reader` module to `reader`.
+- Renamed `MidiPacketBufferReader` to `UsbMidiPacketReader`.
 - Moved `usb_midi_event_packet` code into parent `packet` module.
 - Moved `channel` and `notes` modules into `message` module.
 - Moved `message` module to crate root.
