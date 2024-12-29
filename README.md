@@ -17,7 +17,7 @@ use usb_device::prelude::*;
 use usbd_midi::{
     message::{channel::Channel, notes::Note},
     Message,
-    MidiClass,
+    UsbMidiClass,
     UsbMidiPacketReader,
 };
 
@@ -26,7 +26,7 @@ let mut led = todo!(); // Must implement `embedded_hal::digital::OutputPin`.
 let usb_bus = todo!(); // Must be of type `usb_device::bus::UsbBusAllocator`.
 
 // Create a MIDI class with 1 input and 1 output jack.
-let mut midi = MidiClass::new(&usb_bus, 1, 1).unwrap();
+let mut midi = UsbMidiClass::new(&usb_bus, 1, 1).unwrap();
 
 let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
     .device_class(0)

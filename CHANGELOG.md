@@ -41,8 +41,8 @@ This release focuses on:
 
 ### Changed
 
-- Set edition to 2021.
-- Renamed `MidiClass::send_message` function to `MidiClass::send_packet`.
+- Renamed `MidiClass` to `UsbMidiClass`.
+- Renamed `UsbMidiClass::send_message` function to `UsbMidiClass::send_packet`.
 - Renamed `midi_device` module to `class`.
 - Renamed `usb_midi` module to `packet` and moved it into crate root.
 - Renamed `midi_packet_reader` module to `reader`.
@@ -58,6 +58,7 @@ This release focuses on:
 - Consolidated separate `InvalidCodeIndexNumber` struct into `UsbMidiEventPacketError`.
 - Converted `CodeIndexNumber` struct to enum.
 - Moved descriptor constants into class module and made them private.
+- Set edition to 2021.
 
 ### Removed
 

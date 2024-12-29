@@ -29,7 +29,7 @@ pub const MIDI_PACKET_SIZE: usize = 4;
 pub const MAX_PACKET_SIZE: usize = 64;
 
 /// Packet-level implementation of a USB MIDI device.
-pub struct MidiClass<'a, B: UsbBus> {
+pub struct UsbMidiClass<'a, B: UsbBus> {
     standard_ac: InterfaceNumber,
     standard_mc: InterfaceNumber,
     standard_bulkout: EndpointOut<'a, B>,
@@ -47,23 +47,23 @@ pub enum UsbMidiReadError {
     UsbError(UsbError),
 }
 
-/// Error returned when passing invalid arguments to `MidiClass::new`.
+/// Error returned when passing invalid arguments to `UsbMidiClass::new`.
 #[derive(Debug)]
 pub struct InvalidArguments;
 
-impl<B: UsbBus> MidiClass<'_, B> {
-    /// Creates a new MidiClass with the provided UsbBus and `n_in/out_jacks` embedded input/output jacks
+impl<B: UsbBus> UsbMidiClass<'_, B> {
+    /// Creates a new UsbMidiClass with the provided UsbBus and `n_in/out_jacks` embedded input/output jacks
     /// (or "cables", depending on the terminology).
     /// Note that a maximum of 16 in and 16 out jacks is supported.
     pub fn new(
         alloc: &UsbBusAllocator<B>,
         n_in_jacks: u8,
         n_out_jacks: u8,
-    ) -> core::result::Result<MidiClass<'_, B>, InvalidArguments> {
+    ) -> core::result::Result<UsbMidiClass<'_, B>, InvalidArguments> {
         if n_in_jacks > 16 || n_out_jacks > 16 {
             return Err(InvalidArguments);
         }
-        Ok(MidiClass {
+        Ok(UsbMidiClass {
             standard_ac: alloc.interface(),
             standard_mc: alloc.interface(),
             standard_bulkout: alloc.bulk(MAX_PACKET_SIZE as u16),
@@ -114,7 +114,7 @@ impl<B: UsbBus> MidiClass<'_, B> {
     }
 }
 
-impl<B: UsbBus> UsbClass<B> for MidiClass<'_, B> {
+impl<B: UsbBus> UsbClass<B> for UsbMidiClass<'_, B> {
     fn get_configuration_descriptors(&self, writer: &mut DescriptorWriter) -> Result<()> {
         // AUDIO CONTROL STANDARD
         writer.interface(

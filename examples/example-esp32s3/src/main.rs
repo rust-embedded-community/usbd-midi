@@ -12,7 +12,7 @@ use heapless::Vec;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
 use midi_convert::{parse::MidiTryParseSlice, render_slice::MidiRenderSlice};
 use usb_device::prelude::*;
-use usbd_midi::{CableNumber, MidiClass, UsbMidiEventPacket, UsbMidiPacketReader};
+use usbd_midi::{CableNumber, UsbMidiClass, UsbMidiEventPacket, UsbMidiPacketReader};
 
 static mut EP_MEMORY: [u32; 1024] = [0; 1024];
 
@@ -32,7 +32,7 @@ fn main() -> ! {
     );
 
     // Create a MIDI class with 1 input and 1 output jack.
-    let mut midi_class = MidiClass::new(&usb_bus_allocator, 1, 1).unwrap();
+    let mut midi_class = UsbMidiClass::new(&usb_bus_allocator, 1, 1).unwrap();
 
     // Build the device. It's important to use `0` for the class and subclass fields because
     // otherwise the device will not enumerate correctly on certain hosts.
