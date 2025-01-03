@@ -1,6 +1,16 @@
-//! USB MIDI class implementation for [usb-device](https://crates.io/crates/usb-device).
-
+#![doc = include_str!("../README.md")]
 #![no_std]
 
-pub mod data;
-pub mod midi_device;
+pub mod class;
+pub mod packet;
+
+#[cfg(feature = "message-types")]
+pub mod message;
+
+pub use crate::class::{UsbMidiClass, UsbMidiReadError};
+pub use crate::packet::cable_number::CableNumber;
+pub use crate::packet::reader::UsbMidiPacketReader;
+pub use crate::packet::{UsbMidiEventPacket, UsbMidiEventPacketError};
+
+#[cfg(feature = "message-types")]
+pub use crate::message::Message;

@@ -1,4 +1,7 @@
-//! Traits for type conversions.
+//! Primitives and structures used in USB MIDI data.
+
+pub mod u4;
+pub mod u7;
 
 /// Like from, but will conceptually overflow if the value is too big
 /// this is useful from going from higher ranges to lower ranges

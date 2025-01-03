@@ -1,12 +1,12 @@
 [package]
 name = "usbd-midi"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     "Beau Trepp <beautrepp@gmail.com>",
     "Florian Jung <flo@windfis.ch>",
     "Oliver Rockstedt <info@sourcebox.de>",
 ]
-edition = "2018"
+edition = "2021"
 description = "A USB MIDI implementation for usb-device."
 homepage = "https://github.com/rust-embedded-community/usbd-midi"
 repository = "https://github.com/rust-embedded-community/usbd-midi"
@@ -14,12 +14,17 @@ license = "MIT"
 categories = ["no-std", "embedded", "hardware-support"]
 keywords = ["usb", "midi"]
 
+[features]
+default = ["message-types"]
+message-types = ["dep:num_enum"]
+
 [dependencies]
 usb-device = "0.3"
 
 [dependencies.num_enum]
-version = "0.7.2"
+version = "0.7.3"
 default-features = false
+optional = true
 
 [lints.rust]
 missing_docs = "warn"

@@ -1,14 +1,13 @@
 //! A primitive value with 7-bit length.
 
-use crate::data::byte::from_traits::{FromClamped, FromOverFlow};
-use core::convert::TryFrom;
+use crate::message::data::{FromClamped, FromOverFlow};
 
 /// A primitive value that can be from 0-0x7F
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct U7(pub(crate) u8);
 
 /// Error representing that this value is not a valid u7
-pub struct InvalidU7(u8);
+pub struct InvalidU7(pub u8);
 
 impl TryFrom<u8> for U7 {
     type Error = InvalidU7;

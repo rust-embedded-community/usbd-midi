@@ -1,7 +1,7 @@
 //! Enum representing the MIDI notes.
 
-use crate::data::byte::from_traits::FromOverFlow;
-use crate::data::byte::u7::U7;
+use crate::message::data::u7::U7;
+use crate::message::data::FromOverFlow;
 use num_enum::TryFromPrimitive;
 
 /// A simple enum type that represents all the midi 'notes'.

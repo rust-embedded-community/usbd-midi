@@ -1,15 +1,15 @@
 //! Enum representing the cable number of a packet.
 
-use crate::data::byte::u4::U4;
-use core::convert::TryFrom;
+use crate::packet::UsbMidiEventPacketError;
 
 /// The Cable Number (CN) is a value ranging from 0x0 to 0xF
 /// indicating the number assignment of the Embedded MIDI Jack associated
 /// with the endpoint that is transferring the data
 #[allow(missing_docs)]
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum CableNumber {
+    #[default]
     Cable0 = 0x0,
     Cable1 = 0x1,
     Cable2 = 0x2,
@@ -28,11 +28,9 @@ pub enum CableNumber {
     Cable15 = 0xF,
 }
 
-/// Error indicating an invalid cable number.
-pub struct InvalidCableNumber(u8);
-
 impl TryFrom<u8> for CableNumber {
-    type Error = InvalidCableNumber;
+    type Error = UsbMidiEventPacketError;
+
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
             x if x == CableNumber::Cable0 as u8 => Ok(CableNumber::Cable0),
@@ -51,7 +49,7 @@ impl TryFrom<u8> for CableNumber {
             x if x == CableNumber::Cable13 as u8 => Ok(CableNumber::Cable13),
             x if x == CableNumber::Cable14 as u8 => Ok(CableNumber::Cable14),
             x if x == CableNumber::Cable15 as u8 => Ok(CableNumber::Cable15),
-            _ => Err(InvalidCableNumber(value)),
+            _ => Err(UsbMidiEventPacketError::InvalidCableNumber(value)),
         }
     }
 }
@@ -59,12 +57,6 @@ impl TryFrom<u8> for CableNumber {
 impl From<CableNumber> for u8 {
     fn from(value: CableNumber) -> u8 {
         value as u8
-    }
-}
-
-impl From<CableNumber> for U4 {
-    fn from(value: CableNumber) -> U4 {
-        U4::from_overflowing_u8(u8::from(value))
     }
 }
 

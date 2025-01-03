@@ -1,7 +1,5 @@
 //! Enum representing the MIDI channel.
 
-use core::convert::TryFrom;
-
 /// The Channel is a value ranging from 0x0 to 0xF.
 ///
 /// This is a standard midi concept.
@@ -44,7 +42,7 @@ pub enum Channel {
 }
 
 /// Error indicating an invalid MIDI channel.
-pub struct InvalidChannel(u8);
+pub struct InvalidChannel(pub u8);
 
 impl TryFrom<u8> for Channel {
     type Error = InvalidChannel;

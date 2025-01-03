@@ -1,20 +1,19 @@
 //! Reader for received packets.
 
-use crate::data::usb_midi::usb_midi_event_packet::{MidiPacketParsingError, UsbMidiEventPacket};
-use crate::midi_device::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
-use core::convert::TryFrom;
+use crate::class::{MAX_PACKET_SIZE, MIDI_PACKET_SIZE};
+use crate::packet::{UsbMidiEventPacket, UsbMidiEventPacketError};
 
 /// Packet reader with internal buffer for received message.
-pub struct MidiPacketBufferReader<'a> {
+pub struct UsbMidiPacketReader<'a> {
     buffer: &'a [u8; MAX_PACKET_SIZE],
     position: usize,
     raw_bytes_received: usize,
 }
 
-impl<'a> MidiPacketBufferReader<'a> {
+impl<'a> UsbMidiPacketReader<'a> {
     /// Creates a new reader.
     pub fn new(buffer: &'a [u8; MAX_PACKET_SIZE], raw_bytes_received: usize) -> Self {
-        MidiPacketBufferReader {
+        UsbMidiPacketReader {
             buffer,
             position: 0,
             raw_bytes_received,
@@ -22,8 +21,8 @@ impl<'a> MidiPacketBufferReader<'a> {
     }
 }
 
-impl Iterator for MidiPacketBufferReader<'_> {
-    type Item = Result<UsbMidiEventPacket, MidiPacketParsingError>;
+impl Iterator for UsbMidiPacketReader<'_> {
+    type Item = Result<UsbMidiEventPacket, UsbMidiEventPacketError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.position <= MAX_PACKET_SIZE && self.position < self.raw_bytes_received {

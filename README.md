@@ -12,14 +12,13 @@ This crate requires the use of a HAL that implements the `usb-device` traits.
 
 Turn on an LED as long as note C2 is pressed. The example only shows the hardware-independent parts.
 
-```rust
+```rust ignore
 use usb_device::prelude::*;
 use usbd_midi::{
-    data::{
-        midi::{channel::Channel, message::Message, notes::Note},
-        usb_midi::midi_packet_reader::MidiPacketBufferReader,
-    },
-    midi_device::MidiClass,
+    message::{channel::Channel, notes::Note},
+    Message,
+    UsbMidiClass,
+    UsbMidiPacketReader,
 };
 
 // Prerequisites, must be setup according to the used board.
@@ -27,17 +26,17 @@ let mut led = todo!(); // Must implement `embedded_hal::digital::OutputPin`.
 let usb_bus = todo!(); // Must be of type `usb_device::bus::UsbBusAllocator`.
 
 // Create a MIDI class with 1 input and 1 output jack.
-let mut midi = MidiClass::new(&usb_bus, 1, 1).unwrap();
+let mut midi = UsbMidiClass::new(&usb_bus, 1, 1).unwrap();
 
-    let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
-        .device_class(0)
-        .device_sub_class(0)
-        .strings(&[StringDescriptors::default()
-            .manufacturer("Music Company")
-            .product("MIDI Device")
-            .serial_number("12345678")])
-        .unwrap()
-        .build();
+let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x5e4))
+    .device_class(0)
+    .device_sub_class(0)
+    .strings(&[StringDescriptors::default()
+        .manufacturer("Music Company")
+        .product("MIDI Device")
+        .serial_number("12345678")])
+    .unwrap()
+    .build();
 
 loop {
     if !usb_dev.poll(&mut [&mut midi]) {
@@ -47,10 +46,10 @@ loop {
     let mut buffer = [0; 64];
 
     if let Ok(size) = midi.read(&mut buffer) {
-        let buffer_reader = MidiPacketBufferReader::new(&buffer, size);
-        for packet in buffer_reader.into_iter() {
+        let packet_reader = UsbMidiPacketReader::new(&buffer, size);
+        for packet in packet_reader.into_iter() {
             if let Ok(packet) = packet {
-                match packet.message {
+                match Message::try_from(&packet).unwrap() {
                     Message::NoteOn(Channel1, Note::C2, ..) => {
                         led.set_low().unwrap();
                     },
@@ -73,7 +72,7 @@ the `usb-device` crate:
 
 Cargo.toml:
 
-```
+```ignore
 usb-device = { version = ">=0.3.2", features = ["control-buffer-256"] }
 ```
 
