@@ -1,6 +1,6 @@
 [package]
 name = "usbd-midi"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     "Beau Trepp <beautrepp@gmail.com>",
     "Florian Jung <flo@windfis.ch>",
