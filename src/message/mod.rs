@@ -39,6 +39,28 @@ pub enum Message {
     PitchWheelChange(Channel, U7, U7),
     /// Control Change (CC) message.
     ControlChange(Channel, ControlFunction, U7),
+    /// MTC Quarter Frame message.
+    MtcQuarterFrame(U7),
+    /// Song Position Pointer message.
+    SongPositionPointer(U7, U7),
+    /// Song Select message.
+    SongSelect(U7),
+    /// Tune Request message.
+    TuneRequest,
+    /// Timing Clock message.
+    TimingClock,
+    /// Tick message.
+    Tick,
+    /// Start message.
+    Start,
+    /// Continue message.
+    Continue,
+    /// Stop message.
+    Stop,
+    /// Active Sensing message.
+    ActiveSensing,
+    /// Reset message.
+    Reset,
 }
 
 const NOTE_OFF_MASK: u8 = 0b1000_0000;
@@ -48,6 +70,18 @@ const PROGRAM_MASK: u8 = 0b1100_0000;
 const CHANNEL_AFTERTOUCH_MASK: u8 = 0b1101_0000;
 const PITCH_BEND_MASK: u8 = 0b1110_0000;
 const CONTROL_CHANGE_MASK: u8 = 0b1011_0000;
+
+const MTC_QUARTER_FRAME: u8 = 0xF1;
+const SONG_POSITION_POINTER: u8 = 0xF2;
+const SONG_SELECT: u8 = 0xF3;
+const TUNE_REQUEST: u8 = 0xF6;
+const TIMING_CLOCK: u8 = 0xF8;
+const TICK: u8 = 0xF9;
+const START: u8 = 0xFA;
+const CONTINUE: u8 = 0xFB;
+const STOP: u8 = 0xFC;
+const ACTIVE_SENSING: u8 = 0xFE;
+const RESET: u8 = 0xFF;
 
 impl From<Message> for Raw {
     fn from(value: Message) -> Raw {
@@ -87,6 +121,61 @@ impl From<Message> for Raw {
                 let status = CONTROL_CHANGE_MASK | u8::from(chan);
                 Raw { status, payload }
             }
+            Message::MtcQuarterFrame(frame) => {
+                let payload = Payload::SingleByte(frame);
+                let status = MTC_QUARTER_FRAME;
+                Raw { status, payload }
+            }
+            Message::SongPositionPointer(lsb, msb) => {
+                let payload = Payload::DoubleByte(lsb, msb);
+                let status = SONG_POSITION_POINTER;
+                Raw { status, payload }
+            }
+            Message::SongSelect(song) => {
+                let payload = Payload::SingleByte(song);
+                let status = SONG_SELECT;
+                Raw { status, payload }
+            }
+            Message::TuneRequest => {
+                let payload = Payload::Empty;
+                let status = TUNE_REQUEST;
+                Raw { status, payload }
+            }
+            Message::TimingClock => {
+                let payload = Payload::Empty;
+                let status = TIMING_CLOCK;
+                Raw { status, payload }
+            }
+            Message::Tick => {
+                let payload = Payload::Empty;
+                let status = TICK;
+                Raw { status, payload }
+            }
+            Message::Start => {
+                let payload = Payload::Empty;
+                let status = START;
+                Raw { status, payload }
+            }
+            Message::Continue => {
+                let payload = Payload::Empty;
+                let status = CONTINUE;
+                Raw { status, payload }
+            }
+            Message::Stop => {
+                let payload = Payload::Empty;
+                let status = STOP;
+                Raw { status, payload }
+            }
+            Message::ActiveSensing => {
+                let payload = Payload::Empty;
+                let status = ACTIVE_SENSING;
+                Raw { status, payload }
+            }
+            Message::Reset => {
+                let payload = Payload::Empty;
+                let status = RESET;
+                Raw { status, payload }
+            }
         }
     }
 }
@@ -99,6 +188,46 @@ impl TryFrom<&[u8]> for Message {
             Some(byte) => byte,
             None => return Err(UsbMidiEventPacketError::MissingDataPacket),
         };
+
+        match *status_byte {
+            MTC_QUARTER_FRAME => {
+                return Ok(Message::MtcQuarterFrame(get_u7_at(data, 1)?));
+            }
+            SONG_POSITION_POINTER => {
+                return Ok(Message::SongPositionPointer(
+                    get_u7_at(data, 1)?,
+                    get_u7_at(data, 2)?,
+                ));
+            }
+            SONG_SELECT => {
+                return Ok(Message::SongSelect(get_u7_at(data, 1)?));
+            }
+            TUNE_REQUEST => {
+                return Ok(Message::TuneRequest);
+            }
+            TIMING_CLOCK => {
+                return Ok(Message::TimingClock);
+            }
+            TICK => {
+                return Ok(Message::Tick);
+            }
+            START => {
+                return Ok(Message::Start);
+            }
+            CONTINUE => {
+                return Ok(Message::Continue);
+            }
+            STOP => {
+                return Ok(Message::Stop);
+            }
+            ACTIVE_SENSING => {
+                return Ok(Message::ActiveSensing);
+            }
+            RESET => {
+                return Ok(Message::Reset);
+            }
+            _ => {}
+        }
 
         let event_type = status_byte & 0b1111_0000;
         let channel_bytes = (status_byte) & 0b0000_1111;
@@ -184,6 +313,17 @@ impl Message {
             Self::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::PolyKeyPress,
             Self::ProgramChange(_, _) => CodeIndexNumber::ProgramChange,
             Self::ControlChange(_, _, _) => CodeIndexNumber::ControlChange,
+            Self::MtcQuarterFrame(_) => CodeIndexNumber::SystemCommon2Bytes,
+            Self::SongPositionPointer(_, _) => CodeIndexNumber::SystemCommon3Bytes,
+            Self::SongSelect(_) => CodeIndexNumber::SystemCommon2Bytes,
+            Self::TuneRequest => CodeIndexNumber::SystemCommon1Byte,
+            Self::TimingClock => CodeIndexNumber::SingleByte,
+            Self::Tick => CodeIndexNumber::SingleByte,
+            Self::Start => CodeIndexNumber::SingleByte,
+            Self::Continue => CodeIndexNumber::SingleByte,
+            Self::Stop => CodeIndexNumber::SingleByte,
+            Self::ActiveSensing => CodeIndexNumber::SingleByte,
+            Self::Reset => CodeIndexNumber::SingleByte,
         }
     }
 }
@@ -239,5 +379,16 @@ mod tests {
         channel_aftertouch: ([13, 208, 127, 0], Message::ChannelAftertouch(Channel1, U7(127)).into_packet(Cable0)),
         pitch_wheel: ([14, 224, 64, 32], Message::PitchWheelChange(Channel1, U7(64), U7(32)).into_packet(Cable0)),
         control_change: ([11, 177, 1, 32], Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32)).into_packet(Cable0)),
+        mtc_quarter_frame: ([0x02, 0xF1, 12, 0], Message::MtcQuarterFrame(U7(12)).into_packet(Cable0)),
+        song_position_pointer: ([0x03, 0xF2, 38, 75], Message::SongPositionPointer(U7(38), U7(75)).into_packet(Cable0)),
+        song_select: ([0x02, 0xF3, 4, 0], Message::SongSelect(U7(4)).into_packet(Cable0)),
+        tune_request: ([0x05, 0xF6, 0, 0], Message::TuneRequest.into_packet(Cable0)),
+        timing_clock: ([0x0F, 0xF8, 0, 0], Message::TimingClock.into_packet(Cable0)),
+        tick: ([0x0F, 0xF9, 0, 0], Message::Tick.into_packet(Cable0)),
+        start: ([0x0F, 0xFA, 0, 0], Message::Start.into_packet(Cable0)),
+        continue_: ([0x0F, 0xFB, 0, 0], Message::Continue.into_packet(Cable0)),
+        stop: ([0x0F, 0xFC, 0, 0], Message::Stop.into_packet(Cable0)),
+        active_sensing: ([0x0F, 0xFE, 0, 0], Message::ActiveSensing.into_packet(Cable0)),
+        reset: ([0x0F, 0xFF, 0, 0], Message::Reset.into_packet(Cable0)),
     }
 }
