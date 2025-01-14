@@ -6,24 +6,22 @@ pub mod data;
 pub mod notes;
 pub mod raw;
 
-use crate::message::channel::Channel;
-use crate::message::control_function::ControlFunction;
-use crate::message::data::u14::U14;
-use crate::message::data::u7::U7;
-use crate::message::data::FromClamped;
-use crate::message::notes::Note;
+pub use crate::message::channel::Channel;
+pub use crate::message::control_function::ControlFunction;
+pub use crate::message::data::u14::U14;
+pub use crate::message::data::u7::U7;
+pub use crate::message::data::{FromClamped, FromOverFlow};
+pub use crate::message::notes::Note;
+
 use crate::message::raw::{Payload, Raw};
 use crate::packet::cable_number::CableNumber;
 use crate::packet::code_index_number::CodeIndexNumber;
 use crate::packet::{UsbMidiEventPacket, UsbMidiEventPacketError};
 
-type Velocity = U7;
+/// Note velocity value.
+pub type Velocity = U7;
 
-/// Represents midi messages.
-///
-/// Note: not current exhaustive and SysEx messages end up
-/// being a confusing case. So are currently note implemented
-/// they are sort-of unbounded
+/// Represents the MIDI messages.
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Message {
     /// Note On message.

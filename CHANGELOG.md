@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+This release focuses on improving the internal message data types and their usage.
+
 ### Added
 
 - `Message` enum variants for *System Common* and *System Realtime* messages.
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `U4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU7`.
+- Re-exports of common data types in the `message` module.
 
 ### Changed
 
