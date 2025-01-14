@@ -16,6 +16,8 @@ This release focuses on improving the internal message data types and their usag
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `U4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU7`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `Payload`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `Raw`.
 - Re-exports of common data types in the `message` module.
 
 ### Changed
