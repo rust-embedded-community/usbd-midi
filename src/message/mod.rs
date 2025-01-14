@@ -8,6 +8,7 @@ pub mod raw;
 
 use crate::message::channel::Channel;
 use crate::message::control_function::ControlFunction;
+use crate::message::data::u14::U14;
 use crate::message::data::u7::U7;
 use crate::message::data::FromClamped;
 use crate::message::notes::Note;
@@ -36,13 +37,13 @@ pub enum Message {
     /// Channel aftertouch message.
     ChannelAftertouch(Channel, U7),
     /// Pitchwheel message.
-    PitchWheelChange(Channel, U7, U7),
+    PitchWheelChange(Channel, U14),
     /// Control Change (CC) message.
     ControlChange(Channel, ControlFunction, U7),
     /// MTC Quarter Frame message.
     MtcQuarterFrame(U7),
     /// Song Position Pointer message.
-    SongPositionPointer(U7, U7),
+    SongPositionPointer(U14),
     /// Song Select message.
     SongSelect(U7),
     /// Tune Request message.
@@ -111,7 +112,10 @@ impl From<Message> for Raw {
                 let status = CHANNEL_AFTERTOUCH_MASK | u8::from(chan);
                 Raw { status, payload }
             }
-            Message::PitchWheelChange(chan, lsb, msb) => {
+            Message::PitchWheelChange(chan, value) => {
+                let value = u16::from(value);
+                let lsb = U7::try_from((value & 0x7F) as u8).unwrap();
+                let msb = U7::try_from(((value >> 7) & 0x7F) as u8).unwrap();
                 let payload = Payload::DoubleByte(lsb, msb);
                 let status = PITCH_BEND_MASK | u8::from(chan);
                 Raw { status, payload }
@@ -126,7 +130,10 @@ impl From<Message> for Raw {
                 let status = MTC_QUARTER_FRAME;
                 Raw { status, payload }
             }
-            Message::SongPositionPointer(lsb, msb) => {
+            Message::SongPositionPointer(value) => {
+                let value = u16::from(value);
+                let lsb = U7::try_from((value & 0x7F) as u8).unwrap();
+                let msb = U7::try_from(((value >> 7) & 0x7F) as u8).unwrap();
                 let payload = Payload::DoubleByte(lsb, msb);
                 let status = SONG_POSITION_POINTER;
                 Raw { status, payload }
@@ -194,10 +201,7 @@ impl TryFrom<&[u8]> for Message {
                 return Ok(Message::MtcQuarterFrame(get_u7_at(data, 1)?));
             }
             SONG_POSITION_POINTER => {
-                return Ok(Message::SongPositionPointer(
-                    get_u7_at(data, 1)?,
-                    get_u7_at(data, 2)?,
-                ));
+                return Ok(Message::SongPositionPointer(get_u14(data)?));
             }
             SONG_SELECT => {
                 return Ok(Message::SongSelect(get_u7_at(data, 1)?));
@@ -252,11 +256,7 @@ impl TryFrom<&[u8]> for Message {
             )),
             PROGRAM_MASK => Ok(Message::ProgramChange(channel, get_u7_at(data, 1)?)),
             CHANNEL_AFTERTOUCH_MASK => Ok(Message::ChannelAftertouch(channel, get_u7_at(data, 1)?)),
-            PITCH_BEND_MASK => Ok(Message::PitchWheelChange(
-                channel,
-                get_u7_at(data, 1)?,
-                get_u7_at(data, 2)?,
-            )),
+            PITCH_BEND_MASK => Ok(Message::PitchWheelChange(channel, get_u14(data)?)),
             CONTROL_CHANGE_MASK => Ok(Message::ControlChange(
                 channel,
                 ControlFunction(get_u7_at(data, 1)?),
@@ -309,12 +309,12 @@ impl Message {
             Self::NoteOn(_, _, _) => CodeIndexNumber::NoteOn,
             Self::NoteOff(_, _, _) => CodeIndexNumber::NoteOff,
             Self::ChannelAftertouch(_, _) => CodeIndexNumber::ChannelPressure,
-            Self::PitchWheelChange(_, _, _) => CodeIndexNumber::PitchBendChange,
+            Self::PitchWheelChange(_, _) => CodeIndexNumber::PitchBendChange,
             Self::PolyphonicAftertouch(_, _, _) => CodeIndexNumber::PolyKeyPress,
             Self::ProgramChange(_, _) => CodeIndexNumber::ProgramChange,
             Self::ControlChange(_, _, _) => CodeIndexNumber::ControlChange,
             Self::MtcQuarterFrame(_) => CodeIndexNumber::SystemCommon2Bytes,
-            Self::SongPositionPointer(_, _) => CodeIndexNumber::SystemCommon3Bytes,
+            Self::SongPositionPointer(_) => CodeIndexNumber::SystemCommon3Bytes,
             Self::SongSelect(_) => CodeIndexNumber::SystemCommon2Bytes,
             Self::TuneRequest => CodeIndexNumber::SystemCommon1Byte,
             Self::TimingClock => CodeIndexNumber::SingleByte,
@@ -341,6 +341,12 @@ fn get_u7_at(data: &[u8], index: usize) -> Result<U7, UsbMidiEventPacketError> {
     Ok(U7::from_clamped(data_byte))
 }
 
+fn get_u14(data: &[u8]) -> Result<U14, UsbMidiEventPacketError> {
+    let lsb = get_byte_at_position(data, 1)?;
+    let msb = get_byte_at_position(data, 2)?;
+    Ok(U14::from_clamped(((msb as u16) << 7) | (lsb as u16)))
+}
+
 fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, UsbMidiEventPacketError> {
     match data.get(index) {
         Some(byte) => Ok(*byte),
@@ -352,6 +358,7 @@ fn get_byte_at_position(data: &[u8], index: usize) -> Result<u8, UsbMidiEventPac
 mod tests {
     use crate::message::channel::Channel::{Channel1, Channel2};
     use crate::message::control_function::ControlFunction;
+    use crate::message::data::u14::U14;
     use crate::message::data::u7::U7;
     use crate::message::notes::Note;
     use crate::message::Message;
@@ -377,10 +384,10 @@ mod tests {
         polyphonic_aftertouch: ([10, 160, 36, 64], Message::PolyphonicAftertouch(Channel1, Note::C2, U7(64)).into_packet(Cable0)),
         program_change: ([28, 192, 127, 0], Message::ProgramChange(Channel1, U7(127)).into_packet(Cable1)),
         channel_aftertouch: ([13, 208, 127, 0], Message::ChannelAftertouch(Channel1, U7(127)).into_packet(Cable0)),
-        pitch_wheel: ([14, 224, 64, 32], Message::PitchWheelChange(Channel1, U7(64), U7(32)).into_packet(Cable0)),
+        pitch_wheel: ([14, 224, 64, 32], Message::PitchWheelChange(Channel1, U14(4160)).into_packet(Cable0)),
         control_change: ([11, 177, 1, 32], Message::ControlChange(Channel2, ControlFunction::MOD_WHEEL_1, U7(32)).into_packet(Cable0)),
         mtc_quarter_frame: ([0x02, 0xF1, 12, 0], Message::MtcQuarterFrame(U7(12)).into_packet(Cable0)),
-        song_position_pointer: ([0x03, 0xF2, 38, 75], Message::SongPositionPointer(U7(38), U7(75)).into_packet(Cable0)),
+        song_position_pointer: ([0x03, 0xF2, 38, 75], Message::SongPositionPointer(U14(9638)).into_packet(Cable0)),
         song_select: ([0x02, 0xF3, 4, 0], Message::SongSelect(U7(4)).into_packet(Cable0)),
         tune_request: ([0x05, 0xF6, 0, 0], Message::TuneRequest.into_packet(Cable0)),
         timing_clock: ([0x0F, 0xF8, 0, 0], Message::TimingClock.into_packet(Cable0)),

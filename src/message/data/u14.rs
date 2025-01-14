@@ -4,7 +4,7 @@ use crate::message::data::{FromClamped, FromOverFlow};
 
 /// A primitive value that can be from 0-0x4000
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct U14(u16);
+pub struct U14(pub(crate) u16);
 
 /// Error representing that this value is not a valid u14
 #[derive(Debug, Clone, Eq, PartialEq)]

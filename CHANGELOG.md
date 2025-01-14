@@ -10,10 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - `Message` enum variants for *System Common* and *System Realtime* messages.
-- `U14` primitive value type.
+- `U14` primitive value type used by *Pitch Wheel* and *Song Position Pointer* messages.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `U4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU4`.
 - Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU7`.
+
+### Changed
+
+- Changed pitch wheel `Message` variant from `PitchWheelChange(Channel, U7, U7)` to `PitchWheelChange(Channel, U14)`.
 
 ## [0.4.0] - 2025-01-03
 
