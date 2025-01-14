@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - `Message` enum variants for *System Common* and *System Realtime* messages.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU4`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU7`.
 
 ## [0.4.0] - 2025-01-03
 
