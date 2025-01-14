@@ -3,6 +3,7 @@
 use crate::message::data::{FromClamped, FromOverFlow};
 
 /// A primitive value that can be from 0-0x0F
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct U4(u8);
 
 /// Error representing that this value is not a valid u4
