@@ -7,7 +7,8 @@ authors = [
     "Oliver Rockstedt <info@sourcebox.de>",
 ]
 edition = "2021"
-description = "A USB MIDI implementation for usb-device."
+rust-version = "1.78"
+description = "USB MIDI device class implementation for use with usb-device."
 homepage = "https://github.com/rust-embedded-community/usbd-midi"
 repository = "https://github.com/rust-embedded-community/usbd-midi"
 license = "MIT"
