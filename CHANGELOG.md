@@ -22,7 +22,7 @@ This release focuses on improving the internal message data types and their usag
 
 ### Changed
 
-- Changed pitch wheel `Message` variant from `PitchWheelChange(Channel, U7, U7)` to `PitchWheelChange(Channel, U14)`.
+- Changed pitch wheel `Message` variant from `PitchWheelChange(Channel, U7, U7)` to `PitchWheelChange(Channel, U14)`. Use `U14::from_split_u7` and `U14::split_u7` functions for conversions.
 
 ## [0.4.0] - 2025-01-03
 
