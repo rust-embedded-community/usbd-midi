@@ -23,7 +23,7 @@ const SYSEX_BUFFER_SIZE: usize = 64;
 fn main() -> ! {
     // Some basic setup to run the MCU at maximum clock speed.
     let mut config = Config::default();
-    config.cpu_clock = clock::CpuClock::Clock240MHz;
+    config.cpu_clock = clock::CpuClock::_240MHz;
     let peripherals = esp_hal::init(config);
 
     let usb_bus_allocator = otg_fs::UsbBus::new(

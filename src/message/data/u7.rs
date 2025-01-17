@@ -7,6 +7,7 @@ use crate::message::data::{FromClamped, FromOverFlow};
 pub struct U7(pub(crate) u8);
 
 /// Error representing that this value is not a valid u7
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct InvalidU7(pub u8);
 
 impl TryFrom<u8> for U7 {

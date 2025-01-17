@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-01-17
+
+This release focuses on improving the internal message data types and their usage.
+
+### Added
+
+- `Message` enum variants for *System Common* and *System Realtime* messages.
+- `U14` primitive value type used by *Pitch Wheel* and *Song Position Pointer* messages.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `U4`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU4`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `InvalidU7`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `Payload`.
+- Derive `Debug`, `Clone`, `Eq`, and `PartialEq` for `Raw`.
+- Re-exports of common data types in the `message` module.
+
+### Changed
+
+- Changed pitch wheel `Message` variant from `PitchWheelChange(Channel, U7, U7)` to `PitchWheelChange(Channel, U14)`. Use `U14::from_split_u7` and `U14::split_u7` functions for conversions.
+
 ## [0.4.0] - 2025-01-03
 
 This release focuses on:

@@ -1,5 +1,6 @@
 //! Primitives and structures used in USB MIDI data.
 
+pub mod u14;
 pub mod u4;
 pub mod u7;
 

@@ -3,6 +3,7 @@
 use crate::message::data::u7::U7;
 
 /// Represents the payloads that the midi message may contain.
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Payload {
     /// No payload.
     Empty,
@@ -16,6 +17,7 @@ pub enum Payload {
 ///
 /// A midi message may be in, but without domain logic mainly useful for serializing.
 /// This represents the possible 'shapes', doesn't verify if the data makes sense though!
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Raw {
     /// Status byte.
     pub status: u8,

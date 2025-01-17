@@ -1,22 +1,29 @@
 # usbd-midi
 
-A simple USB MIDI device class for [usb-device](https://crates.io/crates/usb-device).
+A USB MIDI device class implementation for [usb-device](https://crates.io/crates/usb-device) based on the [USB Device Class Definition for MIDI Devices](https://www.usb.org/sites/default/files/midi10.pdf) specification.
 
-Currently this aims to be a very simple implementation, that allows the microcontroller to send or receive MIDI information to/from a host like a desktop computer.
+This class allows the device to exchange MIDI messages with a host like a desktop computer. It requires the use of a driver (e.g. a HAL) that implements the `usb-device` traits.
 
-This crate requires the use of a HAL that implements the `usb-device` traits.
+**NOTE:** only MIDI 1.0 protocol is currently supported.
 
-## Example
+## Message Types
+
+While the crate focuses on transfer functionality, it provides some basic message types with conversions for convenience. These types are gated behind a `message-types` feature, which is enabled by default.
+
+For more complex use cases, it is recommended to use a specialized crate like [midi-types](https://crates.io/crates/midi-types) or [wmidi](https://crates.io/crates/wmidi) and interface with it by using the raw event packet bytes. The [ESP32-S3 example](examples/example-esp32s3/) shows how to do this in detail.
+
+## Examples
+
+The example below shows some basic usage without any platform-dependent parts. Please refer to the [examples](examples/) directory for code that can be run on real hardware.
 
 ### Receive MIDI
 
-Turn on an LED as long as note C2 is pressed. The example only shows the hardware-independent parts.
+Turn on an LED as long as note C2 is pressed.
 
 ```rust ignore
 use usb_device::prelude::*;
 use usbd_midi::{
-    message::{channel::Channel, notes::Note},
-    Message,
+    message::{Message, Channel, Note},
     UsbMidiClass,
     UsbMidiPacketReader,
 };
