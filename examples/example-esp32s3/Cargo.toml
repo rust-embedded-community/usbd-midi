@@ -4,13 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-esp-hal = { version = "0.23", features = ["esp32s3"] }
-esp-backtrace = { version = "0.15.0", features = [
+esp-hal = { version = "1.0.0-rc.0", features = ["esp32s3", "unstable"] }
+esp-backtrace = { version = "0.17.0", features = [
     "esp32s3",
     "panic-handler",
     "println",
 ] }
-esp-println = { version = "0.13.0", features = ["esp32s3", "log"] }
+esp-println = { version = "0.15.0", features = ["esp32s3", "log-04"] }
+esp-bootloader-esp-idf = { version = "0.2.0", features = ["esp32s3"] }
 usb-device = { version = "0.3.2", features = ["control-buffer-256"] }
 usbd-midi = { path = "../../" }
 midi-convert = "0.2.0"

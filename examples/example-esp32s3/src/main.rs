@@ -6,7 +6,7 @@
 use core::ptr::addr_of_mut;
 
 use esp_backtrace as _;
-use esp_hal::{clock, gpio, otg_fs, xtensa_lx_rt, Config};
+use esp_hal::{clock::CpuClock, gpio, otg_fs, xtensa_lx_rt};
 use esp_println::println;
 use heapless::Vec;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
@@ -19,11 +19,12 @@ static mut EP_MEMORY: [u32; 1024] = [0; 1024];
 // Size of the used SysEx buffers in bytes.
 const SYSEX_BUFFER_SIZE: usize = 64;
 
+esp_bootloader_esp_idf::esp_app_desc!();
+
 #[xtensa_lx_rt::entry]
 fn main() -> ! {
     // Some basic setup to run the MCU at maximum clock speed.
-    let mut config = Config::default();
-    config.cpu_clock = clock::CpuClock::_240MHz;
+    let config = esp_hal::Config::default().with_cpu_clock(CpuClock::_240MHz);
     let peripherals = esp_hal::init(config);
 
     let usb_bus_allocator = otg_fs::UsbBus::new(
@@ -47,7 +48,10 @@ fn main() -> ! {
         .build();
 
     // This is the *BOOT* button on the ESP32-S3-DevKitC-1.
-    let button = gpio::Input::new(peripherals.GPIO0, gpio::Pull::Up);
+    let button = gpio::Input::new(
+        peripherals.GPIO0,
+        gpio::InputConfig::default().with_pull(gpio::Pull::Up),
+    );
     let mut last_button_level = button.level();
 
     // Buffer for received SysEx messages from the host.
