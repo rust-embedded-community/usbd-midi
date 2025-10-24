@@ -6,7 +6,7 @@
 use core::ptr::addr_of_mut;
 
 use esp_backtrace as _;
-use esp_hal::{clock::CpuClock, gpio, otg_fs, xtensa_lx_rt};
+use esp_hal::{clock::CpuClock, gpio, main, otg_fs};
 use esp_println::println;
 use heapless::Vec;
 use midi_convert::midi_types::{Channel, MidiMessage, Note, Value7};
@@ -21,7 +21,7 @@ const SYSEX_BUFFER_SIZE: usize = 64;
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
-#[xtensa_lx_rt::entry]
+#[main]
 fn main() -> ! {
     // Some basic setup to run the MCU at maximum clock speed.
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::_240MHz);
